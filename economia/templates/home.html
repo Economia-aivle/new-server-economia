@@ -196,7 +196,7 @@
         })
         .then(response => {
             if (response.ok) {
-                window.location.href = '/onboarding';
+                window.location.href = '/';
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('refresh_token');
             } else {

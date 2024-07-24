@@ -129,7 +129,7 @@
         <a href="{% url 'home' subject_id=1 %}"><img src="{% static 'images/header9999.png' %}" alt="My Image"></a>
         <nav>
             <ul>
-                <li><a href="{% url 'home' %}">학습하기</a></li>
+                <li><a href="{% url 'home' subject_id=1 %}">학습하기</a></li>
                 <li><a href="{% url 'scenarios:scenario_list' %}">시나리오</a></li>
                 <li><a href="{% url 'mypage' %}">마이페이지</a></li>
                 <li><a class="logout-btn">로그아웃</a></li>
