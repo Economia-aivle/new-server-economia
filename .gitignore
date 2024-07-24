@@ -3,3 +3,6 @@ settings.py
 *.pyc
 __pycache__/
 DB_chroma
+faiss_jiwoo
+documents.pkl
+faiss_index.bin
