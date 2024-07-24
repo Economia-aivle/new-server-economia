@@ -1,31 +1,35 @@
+@font-face {
+    font-family: 'omyu_pretty';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');
+    font-weight: bold;
+    font-style: bold;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'omyu_pretty';
+}
+
 body {
     background-color: rgba(224, 244, 255, 1);
     justify-content: center;
-	display: flex;
+    display: flex;
     align-items: center;
-
 }
-.container{
-    margin-top: 5%;
+
+.container {
+    margin-top: 15%;
     width: 60vw;
     height: 75vh;
 }
 
-.white_box{
-    background-color: white;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: 20px;
-}
 button.id_btn, button.pwd_btn {
     box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.25);
     background-color: rgba(57, 167, 255, 1);
     width: 300px;
-    height: 300px;
+    height: 200px;
     color: white;
     font-size: 35px;
     border-radius: 30px;
@@ -36,11 +40,16 @@ button.id_btn, button.pwd_btn {
     font-weight: bold;
     margin: auto;
 }
-.btn_box{
+
+.btn_box {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    gap: 50px;
+    flex-wrap: wrap; /* 화면 크기에 따라 버튼이 줄 바꿈되도록 */
+    align-items: center; /* 수직 중앙 정렬 */
 }
+
 button:active {
     animation: blink 0.2s;
 }
@@ -48,4 +57,20 @@ button:active {
 @keyframes blink {
     0%, 100% { background-color: rgba(57, 167, 255, 1); }
     50% { background-color: rgba(30, 144, 255, 1); }
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 90vw;
+        height: auto;
+        margin-top: 10%;
+    }
+    button.id_btn, button.pwd_btn {
+        width: 100%;
+        height: 150px;
+    }
+    .btn_box {
+        flex-direction: column; /* 작은 화면에서는 버튼들이 세로로 배열되도록 */
+        gap: 20px; /* 세로 배열일 때 간격을 넓게 설정 */
+    }
 }
