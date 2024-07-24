@@ -263,6 +263,14 @@ def tf_quiz_page(request, subjects_id, chapter):
     print(m_question)
     print(m_ans)
     
+    problem_count = Tf.objects.filter(characters_id=characters).count()
+    if problem_count > 50:
+        old_problem = Tf.objects.filter(characters_id=characters).order_by('id')[:8]
+        for obj in old_problem:
+            obj.delete()
+        print('오래된 문제 삭제')
+        
+    
     for i in range(8):
         Tf.objects.create(characters_id=characters, question_text=m_question[i], correct_answer=m_ans[i],
                           subjects_id=subjects_id, chapter=chapter, explanation="123123123")
@@ -309,6 +317,14 @@ def multiple(request, characters, subjects_id, chapter, num):
     character_img = character.kind_url
     print(character_img)
     random_sound = 'sounds/back_sound3.mp3'
+    multiple_response = requests.get(f'http://127.0.0.1:8000/educations/multipledatas/{characters}')
+    multiple_data = multiple_response.json()
+    problem_count = Multiple.objects.filter(characters_id=characters).count()
+    if problem_count > 50:
+        old_problem = Multiple.objects.filter(characters_id=characters).order_by('id')[:8]
+        for obj in old_problem:
+            obj.delete()
+        print('오래된 문제 삭제')
 
     if num == 9:
         return redirect('educations:level_choice', characters=characters, subjects_id=subjects_id, chapter=chapter)
@@ -317,7 +333,7 @@ def multiple(request, characters, subjects_id, chapter, num):
         multiple_response = requests.get(f'http://127.0.0.1:8000/educations/multipledatas/{characters}')
         multiple_data = multiple_response.json()
         multiple_list = [item for item in multiple_data if item['characters'] == characters and item['subjects'] == subjects_id and item['chapter'] == chapter]
-        
+        print(multiple_list)
         user_answer = request.POST.get('answer')
         correct_answer = multiple_list[-num]['correct_answer']
         
@@ -408,6 +424,12 @@ def blank(request, characters, subjects_id, chapter, num):
     character_img = character.kind_url
     print(character_img)
     random_sound = 'sounds/back_sound2.mp3'
+    problem_count = Multiple.objects.filter(characters_id=characters).count()
+    if problem_count > 50:
+        old_problem = Blank.objects.filter(characters_id=characters).order_by('id')[:8]
+        for obj in old_problem:
+            obj.delete()
+        print('오래된 문제 삭제')
    
     if num == 9:
         return redirect('educations:level_choice', characters=characters, subjects_id=subjects_id, chapter=chapter)
@@ -494,11 +516,9 @@ def blank(request, characters, subjects_id, chapter, num):
     return render(request, 'blank.html', context)
 
     
-def study(request, characters, subjects_id, chapter):
+def study(request, subjects_id):
     context = {
-        'characters': characters,
         'subjects_id': subjects_id,
-        'chapter':chapter,
     }
     return render(request,'study.html', context)
 
