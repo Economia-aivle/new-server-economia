@@ -386,7 +386,7 @@ img {border: none;}
     display: block;
     width: 100%;
     height: 100%;
-    background-image: url(images/ad1.png);
+    background-image: url(images/ad.png);
     background-repeat: no-repeat;
     background-size: cover;
     border-radius: 10px;
@@ -486,9 +486,19 @@ img {border: none;}
     margin-left: 10px; /* í…ìŠ¤íŠ¸ì™€ ì´ë¯¸ì§€ ê°„ê²© ì¡°ì ˆ */
 }
 
-.content-body button:hover,
-.content-body a:hover {
+.move-problem-btn:hover,
+.scenario-move-btn:hover,
+.ranking-view:hover,
+.chapter-icon:hover,
+.created-scenario-view:hover,
+.announcement-view:hover,
+.learning-btn:hover,
+.scenario-btn:hover {
     opacity: 0.8;
+}
+
+.ad-link:hover {
+    opacity: 1;
 }
 
 .ranking-view, .chapter-icon,
@@ -500,7 +510,7 @@ img {border: none;}
     border-color: transparent;
     text-align: center;
     font-size: 15px;
-    cursor: pointer; 
+    cursor: pointer;
     margin: auto auto; /* ê°€ìš´ë° ì •ë ¬ */
     flex-direction: column;
     align-items: center;
@@ -532,7 +542,7 @@ img {border: none;}
     border: none;
     cursor: pointer;
   }
-  
+
 .progress-container {
     position: relative;
     width: 200px;

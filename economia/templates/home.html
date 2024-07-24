@@ -117,7 +117,7 @@
             </div>
         </div>
     </div>
- 
+
     </div>
 
 <script>
@@ -146,10 +146,10 @@
         const leftHalf = document.getElementById('left-half');
         const rightHalf = document.getElementById('right-half');
         const progressText = document.getElementById('progress-text');
-        
+
         const angle = percent * 3.6;
 
-        
+
         if (percent <= 50) {
             rightHalf.style.transform = `rotate(${angle}deg)`;
             leftHalf.style.transform = `rotate(0deg)`;
@@ -161,14 +161,14 @@
             rightHalf.style.transform = `rotate(180deg)`;
             leftHalf.style.transform = `rotate(${angle}deg)`;
         }
-        
+
         progressText.textContent = `${percent}%`;
     }
 
     setProgress(parseInt(percent));
 
-    
-    
+
+
     document.addEventListener("DOMContentLoaded", function() {
         var commentTextElements = document.querySelectorAll('.created-scenario');
         var maxLength = 15;  // 원하는 최대 길이
