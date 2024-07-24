@@ -8,7 +8,7 @@
 from django.db import models
 from django.utils import timezone
 import datetime
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 class PlayerManager(BaseUserManager):
     def create_user(self, player_id, password=None, **extra_fields):
