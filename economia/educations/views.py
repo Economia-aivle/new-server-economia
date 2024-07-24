@@ -91,12 +91,15 @@ def previous_quiz(request, characters):
     
     tf_response = requests.get(f'http://127.0.0.1:8000/educations/tfdatas/{characters}')
     tf_data = tf_response.json()
-
+    
+    subject_list = Subjects.objects.values_list('subjects', flat=True)
+    
     # 템플릿에 데이터를 전달
     context = {
         'blank': blank_data,
         'multiple': multiple_data,
-        'tf' : tf_data
+        'tf' : tf_data,
+        'subject_list': subject_list,
     }
     return render(request, 'previous_quiz.html', context)
 

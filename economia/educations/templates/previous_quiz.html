@@ -17,15 +17,9 @@
             <!-- 첫 번째 드롭다운 메뉴 -->
             <select class="dropdown" id="subject_dropdown">
                 <option value="all">모든 카테고리</option>
-                <option value="경제">경제</option>
-                <option value="기업/경영">기업/경영</option>
-                <option value="금융">금융</option>
-                <option value="산업">산업</option>
-                <option value="노동">노동</option>
-                <option value="은행 및 금융용어">은행 및 금융용어</option>
-                <option value="부동산">부동산</option>
-                <option value="디지털 경제용어">디지털 경제용어</option>
-                <option value="은행">은행</option>
+                {% for subject in subject_list %}
+                <option value="{{ subject }}">{{ subject }}</option>
+            {% endfor %}
             </select>
             <!-- 두 번째 드롭다운 메뉴 -->
             <select class="dropdown_level" id="level_dropdown">
