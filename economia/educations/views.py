@@ -361,7 +361,7 @@ def multiple(request, characters, subjects_id, chapter, num):
                 request.session['correct_count'] = 0
 
                 # JSON 응답 전송
-                return JsonResponse({'status': 'complete', 'message': '모든 문제를 맞췄습니다!'})
+                return JsonResponse({'status': 'complete', 'message': '스테이지 클리어!!!'})
             else:
                 # 아직 모든 문제를 맞추지 않은 경우
                 return JsonResponse({'status': 'correct', 'message': '정답입니다.'})
@@ -370,24 +370,24 @@ def multiple(request, characters, subjects_id, chapter, num):
             request.session['wrong_count'] = wrong_count
             # 오답인 경우
             return JsonResponse({'status': 'wrong', 'message': '오답입니다.'})
-    # else:
-        # if num == 1:
-            # result = make_questions('금융', 1)
-            # m_question = result['question']
-            # m_exam = result['exam']
-            # m_ans = result['ans']
-            # print(m_question)
-            # print(m_exam)
-            # print(m_ans)
+    else:
+        if num == 1:
+            result = make_questions('금융', 1)
+            m_question = result['question']
+            m_exam = result['exam']
+            m_ans = result['ans']
+            print(m_question)
+            print(m_exam)
+            print(m_ans)
             
-            # for i in range(5):
-            #     a = m_exam[i][0]
-            #     b = m_exam[i][1]
-            #     c = m_exam[i][2]
-            #     d = m_exam[i][3]
-            #     Multiple.objects.create(characters_id=characters, question_text=m_question[i],
-            #                     option_a = a, option_b = b, option_c = c, option_d = d,
-            #                     correct_answer=int(m_ans[i]), subjects_id=subjects_id, chapter=chapter, explanation="123123123")
+            for i in range(8):
+                a = m_exam[i][0]
+                b = m_exam[i][1]
+                c = m_exam[i][2]
+                d = m_exam[i][3]
+                Multiple.objects.create(characters_id=characters, question_text=m_question[i],
+                                option_a = a, option_b = b, option_c = c, option_d = d,
+                                correct_answer=int(m_ans[i]), subjects_id=subjects_id, chapter=chapter, explanation="123123123")
 
     correct_count = request.session.get('correct_count', 0)
     wrong_count = request.session.get('wrong_count', 0)
@@ -424,12 +424,7 @@ def blank(request, characters, subjects_id, chapter, num):
     character_img = character.kind_url
     print(character_img)
     random_sound = 'sounds/back_sound2.mp3'
-    problem_count = Multiple.objects.filter(characters_id=characters).count()
-    if problem_count > 50:
-        old_problem = Blank.objects.filter(characters_id=characters).order_by('id')[:8]
-        for obj in old_problem:
-            obj.delete()
-        print('오래된 문제 삭제')
+    
    
     if num == 9:
         return redirect('educations:level_choice', characters=characters, subjects_id=subjects_id, chapter=chapter)
@@ -446,7 +441,6 @@ def blank(request, characters, subjects_id, chapter, num):
             # 정답인 경우
             blank_correct_count = request.session.get('blank_correct_count', 0) + 1
             request.session['blank_correct_count'] = blank_correct_count
-            request.session.modified = True  # 세션 데이터가 변경되었음을 명시
             print(f"Correct count updated: {blank_correct_count}")
             if blank_correct_count == 5:
                 # 모든 문제를 맞춘 경우 Stage 모델의 chapter_sub를 3으로 업데이트
@@ -465,10 +459,8 @@ def blank(request, characters, subjects_id, chapter, num):
                 
                 # 세션 초기화
                 request.session['blank_correct_count'] = 0
-                request.session.modified = True  # 세션 데이터가 변경되었음을 명시
-
                 # JSON 응답 전송
-                return JsonResponse({'status': 'complete', 'message': '모든 문제를 맞췄습니다!'})
+                return JsonResponse({'status': 'complete', 'message': '스테이지 클리어!!!'})
             else:
                 # 아직 모든 문제를 맞추지 않은 경우
                 return JsonResponse({'status': 'correct', 'message': '정답입니다.'})
@@ -480,17 +472,24 @@ def blank(request, characters, subjects_id, chapter, num):
             # 오답인 경우
             return JsonResponse({'status': 'wrong', 'message': '오답입니다.'})
     
-    # else:
-    #     if num == 1:
-    #         result = make_questions('금융', 2)
-    #         m_question = result['question']
-    #         m_ans = result['ans']
-    #         print(m_question)
-    #         print(m_ans)
+    else:
+        if num == 1:
+            result = make_questions('금융', 2)
+            m_question = result['question']
+            m_ans = result['ans']
+            print(m_question)
+            print(m_ans)
         
-    #         for i in range(5):
-    #             Blank.objects.create(characters_id=characters, question_text=m_question[i], correct_answer=m_ans[i],
-    #                             subjects_id=subjects_id, chapter=chapter, explanation="123123123")
+            for i in range(8):
+                Blank.objects.create(characters_id=characters, question_text=m_question[i], correct_answer=m_ans[i],
+                                subjects_id=subjects_id, chapter=chapter, explanation="123123123")
+            problem_count = Blank.objects.filter(characters_id=characters).count()
+            print(problem_count)
+            if problem_count > 50:
+                old_problem = Blank.objects.filter(characters_id=characters).order_by('id')[:8]
+                for obj in old_problem:
+                    obj.delete()
+                print('오래된 문제 삭제')
     blank_response = requests.get(f'http://127.0.0.1:8000/educations/blankdatas/{characters}')
     blank_data = blank_response.json()
 
