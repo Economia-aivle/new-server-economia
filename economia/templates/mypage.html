@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 {% load static %}
 <html lang="en">
@@ -7,7 +8,6 @@
     <title>mypage</title>
     <link rel="stylesheet" href="{% static 'mypage.css' %}" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+KR&display=swap">
-    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
   </head>
     {% include 'header.html' %}
   <body>
@@ -17,13 +17,13 @@
         <div class="user-info">
           <h2 class="title">개인정보 변경</h2>
           <a class="update_info" href="update_info" target="_self">개인정보 변경</a>
-          <a class="delete-account" href="{% url 'users:delete_account' %}">회원 탈퇴</a>
+          <a class="delete-account" href="{% url 'users:delete_account' %}" target="_self">회원 탈퇴</a>
         </div>
       </div>
       <div class="info">
         <h2 class="title">이용 안내</h2>
         <a class="ask" href="ask" target="_self">문의하기</a>
-        <a class="notice" href="{/users/notice}" target="_self">공지사항</a>
+        <a class="notice" href="{% url 'users:notice' %}" target="_self">공지사항</a>
         <a class="community-term" href="{% url 'community_term' %}" target="_self">커뮤니티 규칙</a>
         <a class="service-term" href="{% url 'service_term' %}" target="_self">서비스 이용 약관</a>
         <a class="account-term" href="{% url 'account_term' %}" target="_self">개인정보 처리방침</a>
