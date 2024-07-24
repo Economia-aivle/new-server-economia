@@ -5,7 +5,7 @@ main{
 	position : relative;
 	display: flex;
 	justify-content : center;
-	font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'omyu_pretty' ;
 	text-align: center;
 
 }
@@ -24,7 +24,7 @@ body{
     color: black;
     text-align: left;
     font-size: 25px;
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'omyu_pretty' ;
 	margin-left: auto;
 	margin-right: auto;
 	padding: 20px;
@@ -46,8 +46,8 @@ body{
 	bottom: 15%;
 	right: 5%;
 }
-.character img{
-    height: 20vh;
+.enemy_char{
+    height: 25vh;
 	width: 10vw;
 }
 
@@ -64,7 +64,7 @@ body{
     text-align: left;
     padding: 0 20px;
     font-size: 25px;
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'omyu_pretty' ;
     cursor: pointer;
 	margin-left: 40px;
     transition: background-color 0.3s, color 0.3s;
@@ -92,7 +92,7 @@ body{
 	border-bottom-right-radius:20px;
 	cursor: pointer;
 	transition: background-color 0.3s ease;
-	font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'omyu_pretty' ;
 	margin-right: -600px;
 }
 
@@ -218,7 +218,7 @@ body{
 	border-bottom-right-radius:20px;
 	cursor: pointer;
 	transition: background-color 0.3s ease;
-	font-family: 'Noto Sans KR', sans-serif; 
+    font-family: 'omyu_pretty' ;
 	float: right;
 }
 .next:hover {

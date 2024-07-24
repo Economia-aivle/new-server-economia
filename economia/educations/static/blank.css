@@ -5,7 +5,7 @@ main{
 	position : relative;
 	display: flex;
 	justify-content : center;
-	font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'omyu_pretty' ;
 	text-align: center;
 
 }
@@ -80,7 +80,7 @@ input::placeholder {
 	border-bottom-right-radius:20px;
 	cursor: pointer;
 	transition: background-color 0.3s ease;
-	font-family: 'Noto Sans KR', sans-serif; 
+    font-family: 'omyu_pretty' ;
 	float: left;
 	cursor: url('images/sword.png') , auto;
 }
@@ -98,10 +98,10 @@ color: #E0E0E0;
 	width: 100%;
 }
 
-.enemy img{
-	bottom: 30%;
+.enemy_char{
+	bottom: 32%;
 	position: fixed;
-	height: 20vh;
+	height: 25vh;
 	width: 10vw;
 	right: 10%;
 }
@@ -179,6 +179,8 @@ color: #E0E0E0;
 .enemy_magic{
 	position: absolute;
 	z-index: 1;
+	right: 7%;
+	bottom: 32%;
 }
 .enemy_char.wrong{
 	filter: invert(100%);
