@@ -95,8 +95,8 @@ img {border: none;}
 
 .logo {
     /* display: block; */
-    width: 140px;
-    height: 30px;
+    width: 146px;
+    height: 36px;
     position: absolute;
     top: 20px; /* ì‚¬ì´ë“œë°” ìƒë‹¨ìœ¼ë¡œë¶€í„°ì˜ ê±°ë¦¬ */
     left: 20px; /* ì‚¬ì´ë“œë°” ì™¼ìª½ìœ¼ë¡œë¶€í„°ì˜ ê±°ë¦¬ */
@@ -181,7 +181,7 @@ img {border: none;}
 
 .edit-character-btn {
     color: #888787;
-    font-size: 10px;
+    font-size: 14px;
     text-decoration: none;
     position: absolute;
     top: 88px; /* ìºë¦­í„° ì´ë¯¸ì§€ ìœ„ìª½ ëŒ€ê°ì„  ìœ„ì¹˜ */
@@ -193,7 +193,7 @@ img {border: none;}
 
 .my-page-btn {
     color: #888787;
-    font-size: 10px;
+    font-size: 14px;
     text-decoration: none;
     position: absolute;
     top: 405px;
@@ -219,7 +219,7 @@ img {border: none;}
     transform: translateX(-50%);
     font-size: 22px;
     font-weight: bold;
-    color: rgba(57, 167, 255, 1);
+    color: #43BEEE;
 }
 
 
@@ -264,7 +264,7 @@ img {border: none;}
     display: block;
     position: relative;
     border-radius: 10px;
-    background-color: rgba(57, 167, 255, 1);
+    background-color: #43BEEE;
 }
 
 .main-content {
@@ -272,7 +272,7 @@ img {border: none;}
     height: 100%;
     flex: 1;
     padding: 20px;
-    gap: 60px;
+    gap: 50px;
     position: absolute;
     right: 0px;
     display: flex;
@@ -319,7 +319,7 @@ img {border: none;}
 .learning-btn, .scenario-btn {
     text-decoration: none;
     color: rgb(255, 255, 255);
-    background-color: rgba(57, 167, 255, 1);
+    background-color: #43BEEE;
     border-radius: 10px;
     border-color: transparent;
     /* text-align: center; */
@@ -355,7 +355,7 @@ img {border: none;}
 .content-body {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
 }
 
 
@@ -377,12 +377,19 @@ img {border: none;}
 /* ì„¸ ë²ˆì§¸ row ì„¤ì • */
 .advertiser {
     display: flex;
+    border-radius: 10px;
+    padding: 0px;
+    height: 120px;
+}
+
+.ad-link {
+    display: block;
+    width: 100%;
+    height: 100%;
     background-image: url(images/ads.png);
     background-repeat: no-repeat;
     background-size: cover;
     border-radius: 10px;
-    padding: 20px;
-    height: 80px;
 }
 
 .status, .current-scenario-text,
@@ -488,7 +495,7 @@ img {border: none;}
 .created-scenario-view, .announcement-view {
     text-decoration: none;
     color: rgb(255, 255, 255);
-    background-color: rgba(57, 167, 255, 1);
+    background-color: #43BEEE;
     border-radius: 10px;
     border-color: transparent;
     text-align: center;
@@ -514,11 +521,11 @@ img {border: none;}
     text-align: center; /* 글꼴 크기 */
     font-size: 22px; /* 글꼴 크기 */
     font-weight: bold;
-    color: #39A7FF;
+    color: #43BEEE;
 }
 
 .dropbtn {
-    background-color: #3498DB;
+    background-color: #43BEEE;
     color: white;
     padding: 16px;
     font-size: 16px;
@@ -568,7 +575,7 @@ img {border: none;}
     transition: transform 0.5s;
     overflow: hidden;
     background-color: inherit;
-    border: 1px solid #39A7FF;
+    border: 1px solid #43BEEE;
     z-index: 7;
 }
 
