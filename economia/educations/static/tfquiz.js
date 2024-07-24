@@ -1,5 +1,5 @@
 let questionCount = 0;
-const maxQuestions = 5;
+const maxQuestions = 8;
 const usedQuestionIds = [];
 let correctCount = 0; // 클라이언트 측에서 맞춘 문제 개수
 let wrongCount = 0;

@@ -112,7 +112,7 @@
         }
 
         function nextQuestion() {
-            const nextUrl = num >= 5
+            const nextUrl = num >= 8
                 ? "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}"
                 : `/educations/blank/${characters}/${subjects_id}/${chapter}/${num + 1}`;
             window.location.href = nextUrl;

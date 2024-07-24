@@ -39,9 +39,9 @@ class question_form(BaseModel):
     question: list = Field(description="문제")
     ans: list = Field(description="답")
 
-query_set = ['Documents마다 OX 문제와 답 한 개씩 총 5문제를 만들어줘.', 
-             'Documents마다 보기가 4개인 문제와 답 한 개씩 총 5문제를 한국어로 만들어줘. 보기는 숫자를 포함해서 표시해줘. 답은 int형으로 숫자만 알려줘. 중복 답은 없도록 해줘.',
-             'Documents마다 빈칸 문제와 답 한 개씩 총 5문제를 만들어줘.', 
+query_set = ['Documents마다 OX 문제와 답 한 개씩 총 8문제를 만들어줘.', 
+             'Documents마다 보기가 4개인 문제와 답 한 개씩 총 8문제를 한국어로 만들어줘. 보기는 숫자를 포함해서 표시해줘. 답은 int형으로 숫자만 알려줘. 중복 답은 없도록 해줘.',
+             'Documents마다 빈칸 문제와 답 한 개씩 총 8문제를 만들어줘.', 
              ]
 
 form_set = [question_form, selc_question_form, question_form]
@@ -152,7 +152,7 @@ def level_choice(request, characters, subjects_id, chapter):
 def make_questions(cate, q_type): # 숫자로 받을만 하지 않을까? 지금은 0: OX     1: 객관식   2: 빈칸 순서임
     db = chroma_db.get(where={'category': cate})
     
-    docs = random.sample(db['documents'], 5)
+    docs = random.sample(db['documents'], 8)
 
     output_parser = JsonOutputParser(pydantic_object=form_set[q_type])
     format_instructions = output_parser.get_format_instructions()
@@ -188,8 +188,12 @@ def tf_quiz_view(request):
         questions = Tf.objects.filter(chapter=chapter, subjects_id=subjects_id).exclude(id__in=used_question_ids)
         if not questions:
             return JsonResponse({"error": "No questions available."}, status=status.HTTP_404_NOT_FOUND)
-        question = random.choice(questions)
-
+        # question = random.choice(questions)
+        num = request.session.get('num', 0) 
+        question = questions.order_by('-id')[num]
+        num = request.session.get('num', 0) + 1
+        request.session['num'] = num
+        print(num)
         context = {
             "question_id": question.id,
             "question_text": question.question_text,
@@ -259,7 +263,7 @@ def tf_quiz_page(request, subjects_id, chapter):
     print(m_question)
     print(m_ans)
     
-    for i in range(5):
+    for i in range(8):
         Tf.objects.create(characters_id=characters, question_text=m_question[i], correct_answer=m_ans[i],
                           subjects_id=subjects_id, chapter=chapter, explanation="123123123")
     context = {
@@ -277,7 +281,7 @@ def choose_tf_chapter_view(request):
         if not chapter:
             return JsonResponse({"error": "Chapter number is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        questions = Tf.objects.filter(chapter=chapter)[:5]  # 챕터별 문제 5개 가져오기
+        questions = Tf.objects.filter(chapter=chapter)[:8]  # 챕터별 문제 8개 가져오기
 
         if not questions:
             return JsonResponse({"error": "No questions found for the selected chapter."},
@@ -306,7 +310,7 @@ def multiple(request, characters, subjects_id, chapter, num):
     print(character_img)
     random_sound = 'sounds/back_sound3.mp3'
 
-    if num == 6:
+    if num == 9:
         return redirect('educations:level_choice', characters=characters, subjects_id=subjects_id, chapter=chapter)
     # # POST 요청 처리
     if request.method == 'POST':     
@@ -405,7 +409,7 @@ def blank(request, characters, subjects_id, chapter, num):
     print(character_img)
     random_sound = 'sounds/back_sound2.mp3'
    
-    if num == 6:
+    if num == 9:
         return redirect('educations:level_choice', characters=characters, subjects_id=subjects_id, chapter=chapter)
     
     if request.method == 'POST':
@@ -490,8 +494,13 @@ def blank(request, characters, subjects_id, chapter, num):
     return render(request, 'blank.html', context)
 
     
-def study(request):
-    return render(request,'study.html')
+def study(request, characters, subjects_id, chapter):
+    context = {
+        'characters': characters,
+        'subjects_id': subjects_id,
+        'chapter':chapter,
+    }
+    return render(request,'study.html', context)
 
 def summary_anime(request):
     return render(request,'summary_anime.html')

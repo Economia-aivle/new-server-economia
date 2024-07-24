@@ -9,18 +9,18 @@ main {
 }
 
 body {
-	height: 95vh;
+	height: 85vh;
 	background-image: url('images/study_back.png');
 	background-repeat : no-repeat;
-	background-size: cover;
+	background-size: 100% 117%;
 }
 
 .wrap-container {
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
-    width: 1400px;
-    height: 620px;
+    width: 720px;
+    height: 480px;
     position: absolute;
-    margin-top: 100px;
+    margin-top: 1%;
 }
 
 .video-container {

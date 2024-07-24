@@ -1,15 +1,21 @@
 /* Resetting default margin and padding */
+@font-face {
+  font-family: 'omyu_pretty';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');
+  font-weight: bold;
+  font-style: bold;
+}
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     overflow: auto;
-    font-family: 'Noto-Sans-KR'
+    font-family: 'omyu_pretty';
   }
   
   /* Body styles */
   body, html {
-    font-family: 'Noto-Sans-KR';
+    font-family: 'omyu_pretty';
     background-color: #ffffff;
     /* display: flex; */
     height: 100%;
@@ -125,7 +131,7 @@
     }
   }
   .account{
-    width: 30%;
+    width: 50%;
     display: flex;
     justify-content: space-between;
   }

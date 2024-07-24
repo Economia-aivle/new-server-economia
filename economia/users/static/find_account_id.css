@@ -11,12 +11,13 @@ body {
 
 .white_box {
     background-color: rgba(255, 255, 255, 1);
-    width: 750px;
-    height: 700px;
+    width: 50vw;
+    height: 75vh;
     position: absolute;
-    left: 585px;
-    top: 110px;
     border-radius: 20px;
+    left: 25%;
+    top: 15%;
+    
 }
 
 
@@ -112,7 +113,6 @@ button:active {
     font-size: 24px;
     font-weight: bold;
     letter-spacing: 0;
-    margin-left: 45px;
-    margin-top: 30px;
+    margin-left: 5%;
 
 }
