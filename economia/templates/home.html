@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'home.css' %}" />
     <link href="https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
 </head>
 <body>
 <div class="container">
@@ -99,7 +100,7 @@
                         <a class="created-scenario" href="#" target="_self">{{comment.texts}}</a>
                     {% endfor %}
                 </div>
-               
+
                 <div class="announcement">
                     <h1 class="announcement-title">공지</h1>
                     {% for notice in user.notice_list %}
