@@ -47,20 +47,17 @@ def teen_term(request):
 
 
 urlpatterns = [
-    path("", views.index, name='home'),  # Combined and named "home"
+    path("", views.onboarding, name='onboarding'),  # Combined and named "home"
     path('users/', include('users.urls')),
     path('educations/', include('educations.urls')),
     path('scenarios/', include('scenarios.urls')),
     path("chapter", views.chapter),
     path("home/<int:subject_id>", views.home, name='home'),
     path("mypage", views.mypage, name='mypage'),
-    path("onboarding", views.onboarding),
     path("onboarding/re", views.LoginView.as_view(), name='login'),
     path("onboarding/logout", views.LogoutView.as_view(), name='logout'),
     path("update_info", views.update_info),
     path('admin/', admin.site.urls),
-    path("admin_dashboard", admin_dashboard),
-    path("admin_login", admin_login),
     path('community_term/', community_term, name='community_term'),
     path('account_term/', account_term, name='account_term'),
     path('service_term/', service_term, name='service_term'),

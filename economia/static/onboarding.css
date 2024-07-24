@@ -1,21 +1,22 @@
-/* Resetting default margin and padding */
 @font-face {
   font-family: 'omyu_pretty';
   src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/omyu_pretty.woff2') format('woff2');
   font-weight: bold;
   font-style: bold;
 }
+
+/* Resetting default margin and padding */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     overflow: auto;
-    font-family: 'omyu_pretty';
+    font-family: 'omyu_pretty'
   }
   
   /* Body styles */
   body, html {
-    font-family: 'omyu_pretty';
+    font-family: 'Noto-Sans-KR';
     background-color: #ffffff;
     /* display: flex; */
     height: 100%;
@@ -106,7 +107,8 @@
 
   /* Additional links */
   .first-account,
-  .forgot-account {
+  .forgot-account,
+  .admin-login {
     font-size: 14px;
     text-decoration: none;
     color: #000000;

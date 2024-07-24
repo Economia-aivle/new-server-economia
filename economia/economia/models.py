@@ -10,12 +10,33 @@ from django.utils import timezone
 import datetime
 from django.contrib.auth.models import AbstractBaseUser
 
-class Player(AbstractBaseUser):
+class PlayerManager(BaseUserManager):
+    def create_user(self, player_id, password=None, **extra_fields):
+        if not player_id:
+            raise ValueError('The Player ID must be set')
+        
+        player = self.model(player_id=player_id, **extra_fields)
+        player.set_password(password)
+        player.save(using=self._db)
+        return player
+
+    def create_superuser(self, player_id, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self.create_user(player_id, password, **extra_fields)
+
+class Player(AbstractBaseUser, PermissionsMixin):  # PermissionsMixin 추가
     id = models.BigAutoField(primary_key=True)
     player_id = models.CharField(max_length=20, unique=True)
     player_name = models.CharField(max_length=5, blank=True, null=True)
     nickname = models.CharField(unique=True, max_length=255)
-    last_login = models.DateTimeField(auto_now_add=True)
+    last_login = models.DateTimeField(auto_now=True)
     email = models.CharField(unique=True, max_length=255)
     school = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
@@ -23,8 +44,10 @@ class Player(AbstractBaseUser):
     is_superuser = models.BooleanField(default=False)
     password = models.CharField(max_length=255)
 
+    objects = PlayerManager()
+
     USERNAME_FIELD = 'player_id'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['email']
 
     def __str__(self):
         return self.player_id
@@ -36,7 +59,7 @@ class Player(AbstractBaseUser):
         return self.is_superuser
 
     class Meta:
-        managed = False
+        managed = True  # 실제 데이터베이스 테이블을 생성하도록 설정
         db_table = 'player'
 
 class AuthGroup(models.Model):
