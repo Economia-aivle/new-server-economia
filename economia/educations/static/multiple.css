@@ -47,8 +47,8 @@ body{
 	right: 5%;
 }
 .enemy_char{
-    height: 25vh;
-	width: 10vw;
+    height: 35vh;
+	width: 15vw;
 }
 
   
@@ -166,10 +166,20 @@ body{
 }
 .enemy_char.wrong{
 	filter: invert(100%);
+	animation: vibration .1s infinite;
 }
+@keyframes vibration {
+	from {
+	  transform: rotate(5deg);
+	}
+	to {
+	  transform: rotate(-5deg);
+	}
+  }
 
 .mychar.wrong{
 	filter: invert(100%);
+	animation: vibration .1s infinite;
 }
 
 .answer-bubble .ans{
@@ -225,3 +235,13 @@ body{
 	background-color: #1A85D6; 
 	color: #E0E0E0; 
 	}
+
+#playSoundButton{
+	background-image: url(images/music_off.png) ;
+	background-repeat : no-repeat;
+	background-size: cover;
+	background-color: transparent;
+	border: none;
+	width: 50px;
+	height: 50px;
+}

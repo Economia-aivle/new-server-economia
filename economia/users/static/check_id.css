@@ -40,7 +40,12 @@ body {
     border-radius: 20px;
     padding: 60px;
     box-shadow: 0 10px 30px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: auto;
     text-align: center;
+    align-items: center;
 }
 
 .title_check_id {

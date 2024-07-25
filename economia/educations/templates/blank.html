@@ -13,7 +13,7 @@
     {% include 'quiz_header2.html' %}
     <audio id="myAudio" src="{% static random_sound %}" preload="auto"></audio>
 
-    <button id="playSoundButton">Play Sound</button>
+    <button id="playSoundButton"></button>
     <div class="life">
         <img id="lp1" src="{% static 'images/lp.png' %}" alt="lp">
         <img id="lp2" src="{% static 'images/lp.png' %}" alt="lp">
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     <img class="enemy_magic" src="{% static 'images/magic.gif' %}" alt="" style="display:none;">
-                    <img class="enemy_char" src="{% static 'images/enemy1.png' %}" alt="char" />
+                    <img class="enemy_char" src="{% static 'images/enemy3.png' %}" alt="char" />
                     <div class="hp-bar-container">
                         <div id="hp-bar" class="hp-bar" style="width: {{ hp_percentage }}%;"></div>
                     </div>
@@ -155,18 +155,21 @@
                 if (localStorage.getItem('isPlaying') === 'true') {
                     audio.currentTime = parseFloat(localStorage.getItem('currentTime')) || 0;
                     audio.play();
-                    playSoundButton.textContent = 'Pause Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_on.png")';
                     isPlaying = true;
+                }
+                else{
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_off.png")';
                 }
             }
 
             playSoundButton.addEventListener('click', () => {
                 if (isPlaying) {
                     audio.pause();
-                    playSoundButton.textContent = 'Play Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_off.png")';
                 } else {
                     audio.play();
-                    playSoundButton.textContent = 'Pause Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_on.png")';
                 }
                 isPlaying = !isPlaying;
                 localStorage.setItem('isPlaying', isPlaying);

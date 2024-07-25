@@ -15,7 +15,7 @@ body{
 	background-size: 100% 117%;
 }
 .question-container{
-	margin-right: 5%;
+	right: -25%;
 	top: -60%
 }
 
@@ -161,16 +161,15 @@ color: #E0E0E0;
 	
 }
 
-.answer-bubble .ans{
+.wrong-container .answer-bubble .ans{
     font-size: 60px;
     margin-top: 30px;
 }
-.answer-bubble p{
+.wrong-container .answer-bubble p{
     font-size: 20px;
 }
-.answer-bubble {
-    margin-left: 10%;
-    margin-right: -10%;
+.wrong-container .answer-bubble {
+    margin-left: 20%;
 	position: relative;
 	background: #ffffff;
 	border-radius: .4em;
@@ -179,7 +178,7 @@ color: #E0E0E0;
     padding: 20px;
 }
 
-.answer-bubble:after {
+.wrong-container .answer-bubble:after {
 	content: '';
 	position: absolute;
 	bottom: 0;
@@ -266,8 +265,14 @@ color: #E0E0E0;
 	transform: rotate(90deg);
 }
 .mychar{
+	position: fixed;
 	height: 30vh;
 	width: 15vw;
+	bottom:5%
+}
+.mychar.wrong{
+	filter: invert(100%);
+	animation: vibration .1s infinite;
 }
 
 .life{
@@ -279,3 +284,31 @@ color: #E0E0E0;
 #playSoundButton{
 	float: right;
 }
+
+.magic{
+	margin-left: 10%;
+	position: fixed;
+	bottom: 10%;
+	left:-1%;
+	z-index: 1;
+}
+
+.enemy_magic{
+	position: fixed;
+	z-index: 1;
+	right: 10%;
+	bottom: 10%;
+}
+
+.enemy.wrong{
+	filter: invert(100%);
+	animation: vibration .1s infinite;
+}
+@keyframes vibration {
+	from {
+	  transform: rotate(5deg);
+	}
+	to {
+	  transform: rotate(-5deg);
+	}
+  }

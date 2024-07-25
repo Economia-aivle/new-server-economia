@@ -190,10 +190,10 @@ def tf_quiz_view(request):
             return JsonResponse({"error": "No questions available."}, status=status.HTTP_404_NOT_FOUND)
         # question = random.choice(questions)
         num = request.session.get('num', 0) 
+        print(num)
         question = questions.order_by('-id')[num]
         num = request.session.get('num', 0) + 1
         request.session['num'] = num
-        print(num)
         context = {
             "question_id": question.id,
             "question_text": question.question_text,

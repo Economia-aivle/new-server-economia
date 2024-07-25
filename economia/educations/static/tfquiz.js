@@ -83,21 +83,34 @@ function submitAnswer(answer) {
     .then(response => response.json())
     .then(data => {
         if (data.is_correct) {
+            document.querySelector('.enemy_magic').style.display = 'block';
+            document.querySelector('.enemy').classList.add('wrong');
+            setTimeout(function() {
             alert('정답입니다!');
+            document.querySelector('.enemy').classList.remove('wrong');
+            document.querySelector('.enemy_magic').style.display = 'none';
+        }, 1000);
             correctCount++;
             updateHPBar()
         } else {
+            document.querySelector('.magic').style.display = 'block';
+            document.querySelector('.mychar').classList.add('wrong');
+            setTimeout(function() {
             alert('오답입니다. 설명: ' + data.explanation);
+            document.querySelector('.mychar').classList.remove('wrong');
+            document.querySelector('.magic').style.display = 'none';
+            }, 1000);
             wrongCount++;
             console.log(wrongCount)
             if(wrongCount==1){
                 document.getElementById('lp1').style.display = 'none';
             }
             else if(wrongCount==2){
-                document.getElementById('lp2').style.display = 'none';
+                    document.getElementById('lp2').style.display = 'none';
             }
             else if(wrongCount==3){
-                document.getElementById('lp3').style.display = 'none';
+                    document.getElementById('lp3').style.display = 'none';
+
                 window.location.href = initialData.levelurl;
             }
         }

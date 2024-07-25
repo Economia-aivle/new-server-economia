@@ -42,6 +42,7 @@ body{
 }
 .character .mychar.wrong{
 	filter: invert(100%);
+	animation: vibration .1s infinite;
 }
 
 .answer_form{
@@ -101,8 +102,8 @@ color: #E0E0E0;
 .enemy_char{
 	bottom: 32%;
 	position: fixed;
-	height: 25vh;
-	width: 10vw;
+	height: 40vh;
+	width: 20vw;
 	right: 10%;
 }
 .hp-bar-container {
@@ -128,7 +129,7 @@ color: #E0E0E0;
     height: 230px;
 	max-height: 230px;
     padding: 20px;
-	right: 70%;
+	right: 80%;
 	bottom: 100%;
 	display: flex;
   	justify-content: center;
@@ -184,6 +185,7 @@ color: #E0E0E0;
 }
 .enemy_char.wrong{
 	filter: invert(100%);
+	animation: vibration .1s infinite;
 }
 
 #playSoundButton{
@@ -225,4 +227,23 @@ color: #E0E0E0;
 .next:hover {
 	background-color: #1A85D6; 
 	color: #E0E0E0; 
+	}
+
+	@keyframes vibration {
+		from {
+		  transform: rotate(5deg);
+		}
+		to {
+		  transform: rotate(-5deg);
+		}
+	  }
+
+	  #playSoundButton{
+		background-image: url(images/music_off.png) ;
+		background-repeat : no-repeat;
+		background-size: cover;
+		background-color: transparent;
+		border: none;
+		width: 50px;
+		height: 50px;
 	}
