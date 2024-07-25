@@ -103,7 +103,7 @@ color: #E0E0E0;
 }
 
 
-.answer-bubble {
+.wrap-container .answer-bubble {
     margin-left: 10%;
     margin-right: -10%;
 	position: relative;
@@ -114,7 +114,7 @@ color: #E0E0E0;
     padding: 20px;
 }
 
-.answer-bubble:after {
+.wrap-container .answer-bubble:after {
 	content: '';
 	position: absolute;
 	bottom: 0;
@@ -141,17 +141,13 @@ color: #E0E0E0;
     text-align: center;
 }
 .wrong-container .character img{
-    margin-top: 15%;
-    height: 156px;
-    width: 155px;
+    margin-bottom: 15%;
     float: left;
     object-fit: cover;
 }
 
 .wrong-container { 
-    margin-top: 5%;
-	width:1400px;
-	height:600px;
+    margin-top: 10%;
 	position:absolute;
 	top : 10%;
 	justify-content: center;
@@ -169,7 +165,7 @@ color: #E0E0E0;
     font-size: 20px;
 }
 .wrong-container .answer-bubble {
-    margin-left: 20%;
+    margin-left: 25%;
 	position: relative;
 	background: #ffffff;
 	border-radius: .4em;
@@ -178,7 +174,7 @@ color: #E0E0E0;
     padding: 20px;
 }
 
-.wrong-container .answer-bubble:after {
+/* .wrong-container .answer-bubble:after {
 	content: '';
 	position: absolute;
 	bottom: 0;
@@ -191,7 +187,7 @@ color: #E0E0E0;
 	border-left: 0;
 	margin-left: -0.766em;
 	margin-bottom: -1.531em;
-}
+} */
 .wrong-container .next{
 	background-color: #39A7FF;
 	font-size: 20px;
@@ -312,3 +308,18 @@ color: #E0E0E0;
 	  transform: rotate(-5deg);
 	}
   }
+
+  #playSoundButton{
+	background-image: url(images/music_off.png) ;
+	background-repeat : no-repeat;
+	background-size: cover;
+	background-color: transparent;
+	border: none;
+	width: 50px;
+	height: 50px;
+	margin-right: 10%;
+}
+
+.enemy_f{
+	enemy_f
+}

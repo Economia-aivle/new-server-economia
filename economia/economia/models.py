@@ -127,7 +127,7 @@ class ChildComments(models.Model):
     imgfile = models.ImageField(null=True, upload_to="", blank=True, default="")
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'child_comments'
 
 class Comments(models.Model):
@@ -272,10 +272,11 @@ class Scenario(models.Model):
     subjects = models.ForeignKey('Subjects', models.DO_NOTHING)
     title = models.CharField(max_length=100, blank=True, null=True)
     question_text = models.CharField(max_length=1000, blank=True, null=True)
+    ai_answer = models.CharField(max_length=1000, blank=True, null=True)
     start_time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'scenario'
 
 

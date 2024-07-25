@@ -23,19 +23,19 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 
 from transformers import TextStreamer, AutoModelForCausalLM, AutoTokenizer, StoppingCriteria, StoppingCriteriaList
 
-#챗봇
-# 모델과 토크나이져 로드
-model_name = "harangstar/Llama3"
-model = AutoModelForCausalLM.from_pretrained(model_name).to("cpu")
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+# #챗봇
+# # 모델과 토크나이져 로드
+# model_name = "harangstar/Llama3"
+# model = AutoModelForCausalLM.from_pretrained(model_name).to("cpu")
+# tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-alpaca_prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+# alpaca_prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
 
-### Instruction:
-{}
+# ### Instruction:
+# {}
 
-### Response:
-{}"""
+# ### Response:
+# {}"""
 
 
 
@@ -276,6 +276,21 @@ def tf_quiz_page(request, subjects_id, chapter):
     sounds = ['sounds/back_sound1.mp3', 'sounds/back_sound2.mp3', 'sounds/back_sound3.mp3']
     random_sound = random.choice(sounds)
     print(character_img)
+    
+    if 'char1' in character_img:
+        character_img_f = character_img.replace('char1', 'char1 f')
+    elif 'char2' in character_img:
+        character_img_f = character_img.replace('char2', 'char2 f')
+    elif 'char3' in character_img:
+        character_img_f = character_img.replace('char3', 'char3 f')
+    elif 'char4' in character_img:
+        character_img_f = character_img.replace('char4', 'char4 f')
+    elif 'char5' in character_img:
+        character_img_f = character_img.replace('char5', 'char5 f')
+    else:
+        character_img_f = character_img  # 위 조건에 해당하지 않는 경우 원본 URL 유지
+    
+    
     result = make_questions('금융', 0)
     m_question = result['question']
     m_ans = result['ans']
@@ -299,6 +314,7 @@ def tf_quiz_page(request, subjects_id, chapter):
               'chapter': chapter,
               'character_img':character_img,
               'random_sound': random_sound,
+              'character_img_f': character_img_f
     } 
     return render(request, 'tfquiz.html', context)
 
@@ -335,6 +351,20 @@ def multiple(request, characters, subjects_id, chapter, num):
     character = Characters.objects.get(id=characters)
     character_img = character.kind_url
     print(character_img)
+    
+    if 'char1' in character_img:
+        character_img_f = character_img.replace('char1', 'char1 f')
+    elif 'char2' in character_img:
+        character_img_f = character_img.replace('char2', 'char2 f')
+    elif 'char3' in character_img:
+        character_img_f = character_img.replace('char3', 'char3 f')
+    elif 'char4' in character_img:
+        character_img_f = character_img.replace('char4', 'char4 f')
+    elif 'char5' in character_img:
+        character_img_f = character_img.replace('char5', 'char5 f')
+    else:
+        character_img_f = character_img  # 위 조건에 해당하지 않는 경우 원본 URL 유지
+    
     random_sound = 'sounds/back_sound3.mp3'
     multiple_response = requests.get(f'http://127.0.0.1:8000/educations/multipledatas/{characters}')
     multiple_data = multiple_response.json()
@@ -389,24 +419,24 @@ def multiple(request, characters, subjects_id, chapter, num):
             request.session['wrong_count'] = wrong_count
             # 오답인 경우
             return JsonResponse({'status': 'wrong', 'message': '오답입니다.'})
-    # else:
-        # if num == 1:
-            # result = make_questions('금융', 1)
-            # m_question = result['question']
-            # m_exam = result['exam']
-            # m_ans = result['ans']
-            # print(m_question)
-            # print(m_exam)
-            # print(m_ans)
+    else:
+        if num == 1:
+            result = make_questions('금융', 1)
+            m_question = result['question']
+            m_exam = result['exam']
+            m_ans = result['ans']
+            print(m_question)
+            print(m_exam)
+            print(m_ans)
             
-            # for i in range(5):
-            #     a = m_exam[i][0]
-            #     b = m_exam[i][1]
-            #     c = m_exam[i][2]
-            #     d = m_exam[i][3]
-            #     Multiple.objects.create(characters_id=characters, question_text=m_question[i],
-            #                     option_a = a, option_b = b, option_c = c, option_d = d,
-            #                     correct_answer=int(m_ans[i]), subjects_id=subjects_id, chapter=chapter, explanation="123123123")
+            for i in range(5):
+                a = m_exam[i][0]
+                b = m_exam[i][1]
+                c = m_exam[i][2]
+                d = m_exam[i][3]
+                Multiple.objects.create(characters_id=characters, question_text=m_question[i],
+                                option_a = a, option_b = b, option_c = c, option_d = d,
+                                correct_answer=int(m_ans[i]), subjects_id=subjects_id, chapter=chapter, explanation="123123123")
 
     correct_count = request.session.get('correct_count', 0)
     wrong_count = request.session.get('wrong_count', 0)
@@ -429,6 +459,7 @@ def multiple(request, characters, subjects_id, chapter, num):
               'wrong_count' : wrong_count,
               'character_img' : character_img,
               'random_sound' :random_sound,
+              'character_img_f':character_img_f,
               }
     
     
@@ -442,6 +473,21 @@ def blank(request, characters, subjects_id, chapter, num):
     character = Characters.objects.get(id=characters)
     character_img = character.kind_url
     print(character_img)
+    
+    if 'char1' in character_img:
+        character_img_f = character_img.replace('char1', 'char1 f')
+    elif 'char2' in character_img:
+        character_img_f = character_img.replace('char2', 'char2 f')
+    elif 'char3' in character_img:
+        character_img_f = character_img.replace('char3', 'char3 f')
+    elif 'char4' in character_img:
+        character_img_f = character_img.replace('char4', 'char4 f')
+    elif 'char5' in character_img:
+        character_img_f = character_img.replace('char5', 'char5 f')
+    else:
+        character_img_f = character_img  # 위 조건에 해당하지 않는 경우 원본 URL 유지
+    
+    
     random_sound = 'sounds/back_sound2.mp3'
     problem_count = Multiple.objects.filter(characters_id=characters).count()
     if problem_count > 50:
@@ -499,17 +545,17 @@ def blank(request, characters, subjects_id, chapter, num):
             # 오답인 경우
             return JsonResponse({'status': 'wrong', 'message': '오답입니다.'})
     
-    # else:
-    #     if num == 1:
-    #         result = make_questions('금융', 2)
-    #         m_question = result['question']
-    #         m_ans = result['ans']
-    #         print(m_question)
-    #         print(m_ans)
+    else:
+        if num == 1:
+            result = make_questions('금융', 2)
+            m_question = result['question']
+            m_ans = result['ans']
+            print(m_question)
+            print(m_ans)
         
-    #         for i in range(5):
-    #             Blank.objects.create(characters_id=characters, question_text=m_question[i], correct_answer=m_ans[i],
-    #                             subjects_id=subjects_id, chapter=chapter, explanation="123123123")
+            for i in range(5):
+                Blank.objects.create(characters_id=characters, question_text=m_question[i], correct_answer=m_ans[i],
+                                subjects_id=subjects_id, chapter=chapter, explanation="123123123")
     blank_response = requests.get(f'http://127.0.0.1:8000/educations/blankdatas/{characters}')
     blank_data = blank_response.json()
 
@@ -520,6 +566,7 @@ def blank(request, characters, subjects_id, chapter, num):
     blank_wrong_count = request.session.get('blank_wrong_count', 0)
     hp_percentage = max(0, 100 - (blank_correct_count * 20))  # 체력 퍼센트 계산
     context = {
+        'character_img_f':character_img_f,
         'question': question,
         'num': num,
         'characters': characters,
@@ -536,8 +583,10 @@ def blank(request, characters, subjects_id, chapter, num):
 
     
 def study(request, subjects_id):
+    subject = Subjects.objects.get(id=subjects_id)
+    subject_name = subject.subjects
     context = {
-        'subjects_id': subjects_id,
+        'subject_name': subject_name,
     }
     return render(request,'study.html', context)
 

@@ -31,10 +31,10 @@
                 <form id="answer-form" method="post">
                     {% csrf_token %}
                     <input type="hidden" id="answer" name="answer" value="">
-                    <button class="option-btn" type="button" id="option1" onclick="selectOption(this)" name="answer" value="1">1. {{ question.option_a }}</button>
-                    <button class="option-btn" type="button" id="option2" onclick="selectOption(this)" name="answer" value="2">2. {{ question.option_b }}</button>
-                    <button class="option-btn" type="button" id="option3" onclick="selectOption(this)" name="answer" value="3">3. {{ question.option_c }}</button>
-                    <button class="option-btn" type="button" id="option4" onclick="selectOption(this)" name="answer" value="4">4. {{ question.option_d }}</button>
+                    <button class="option-btn" type="button" id="option1" onclick="selectOption(this)" name="answer" value="1">{{ question.option_a }}</button>
+                    <button class="option-btn" type="button" id="option2" onclick="selectOption(this)" name="answer" value="2">{{ question.option_b }}</button>
+                    <button class="option-btn" type="button" id="option3" onclick="selectOption(this)" name="answer" value="3">{{ question.option_c }}</button>
+                    <button class="option-btn" type="button" id="option4" onclick="selectOption(this)" name="answer" value="4">{{ question.option_d }}</button>
                 </form>
             </div>
             
@@ -47,6 +47,7 @@
             </div>
         </div>
         <div class="wrong-container" id="wrong-container" style="display:none;">
+            <img class="enemy_f" src="{{ character_img_f }}" alt="char" />
             <div class="answer-bubble">
                 <h1>Q{{ num }}. {{ question.question_text }}</h1>
                 <p class="ans">답: {{ question.correct_answer }}</p>
@@ -113,8 +114,8 @@
                     setTimeout(function () {
                         document.querySelector('.wrap-container').style.display = 'none';
                         document.querySelector('.character').style.display = 'none';
-                        document.querySelector('.mychar').style.display = 'none';
                         document.querySelector('.magic').style.display = 'none';
+                        document.querySelector('.mychar').style.display = 'none';
                         document.querySelector('.question-container').style.display = 'none';
                         document.getElementById('wrong-container').style.display = 'block';
                     }, 1000);

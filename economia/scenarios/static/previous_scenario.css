@@ -187,9 +187,6 @@ body {
     float: right;
     margin-top: 3px;
 }
-.comment_container p {
-    width: 1200px;
-}
 
 .answer_box {
     background-color: #E0F4FF;

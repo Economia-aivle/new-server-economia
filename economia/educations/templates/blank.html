@@ -33,6 +33,7 @@
                 </form>
                 <div class="enemy">
                     <div class="question-container">
+                        
                         <div class="question">
                             Q{{ num }}. {{ question.question_text }}
                         </div>
@@ -46,6 +47,7 @@
             </div>
         </div>
         <div class="wrong-container" id="wrong-container" style="display:none;">
+            <img class="enemy_f" src="{{ character_img_f }}" alt="char" />
             <div class="answer-bubble">
                 <p class="ans">답: {{ question.correct_answer }}</p>
                 <p>
