@@ -563,7 +563,7 @@ def chatbot(request):
                     )
                 ],
                 return_tensors="pt",
-            ).to("cpu")
+            ).to("cuda")
 
             text_streamer = TextStreamer(tokenizer)
             output = model.generate(

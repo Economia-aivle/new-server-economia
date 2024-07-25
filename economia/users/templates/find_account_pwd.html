@@ -60,11 +60,12 @@
                             $('#resend-btn').prop('disabled', true);
                         },
                         error: function(xhr, status, error) {
-                            $('#message').text('재전송 요청 중 오류가 발생했습니다.');
+                            $('#message').html('<span class="error-message">재전송 요청 중 오류가 발생했습니다.</span>');
                         }
                     });
                 } else {
-                    $('#message').text('이메일을 입력하세요.');
+                    $('#message').html('<span class="error-message">이메일을 입력하세요.</span>');
+
                 }
             });
 
@@ -92,7 +93,7 @@
                         }
                     });
                 } else {
-                    $('#message').text('이메일, 인증 코드, 플레이어 ID를 모두 입력하세요.');
+                    $('#message').html('<span class="error-message">이메일, 인증 코드, 플레이어 ID를 모두 입력하세요.</span>');
                 }
             });
 

@@ -17,7 +17,7 @@
         <img id="lp1" src="{% static 'images/lp.png' %}" alt="lp">
         <img id="lp2" src="{% static 'images/lp.png' %}" alt="lp">
         <img id="lp3" src="{% static 'images/lp.png' %}" alt="lp">
-        <button id="playSoundButton">Play Sound</button>
+        <button id="playSoundButton"></button>
     </div>
     <div class="question-container">
         Q{{ num }}. {{ question.question_text }}
@@ -41,7 +41,7 @@
         </div>
         <div class="character" onclick="submitAnswer()">
             <img class="enemy_magic" src="{% static 'images/magic.gif' %}" alt="" style="display:none;">
-            <img class="enemy_char" src="{% static 'images/enemy1.png' %}" alt="char" />
+            <img class="enemy_char" src="{% static 'images/enemy2.png' %}" alt="char" />
             <div class="hp-bar-container">
                 <div id="hp-bar" class="hp-bar" style="width: {{ hp_percentage }}%;"></div>
             </div>
@@ -113,6 +113,7 @@
                     setTimeout(function () {
                         document.querySelector('.wrap-container').style.display = 'none';
                         document.querySelector('.character').style.display = 'none';
+                        document.querySelector('.mychar').style.display = 'none';
                         document.querySelector('.magic').style.display = 'none';
                         document.querySelector('.question-container').style.display = 'none';
                         document.getElementById('wrong-container').style.display = 'block';
@@ -168,19 +169,20 @@
                 audio.currentTime = audioCurrentTime;
                 if (isPlaying) {
                     audio.play();
-                    playSoundButton.textContent = 'Pause Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_on.png")';
                 } else {
-                    playSoundButton.textContent = 'Play Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_off.png")';
                 }
             }
 
             playSoundButton.addEventListener('click', () => {
                 if (isPlaying) {
                     audio.pause();
-                    playSoundButton.textContent = 'Play Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_off.png")';
                 } else {
                     audio.play();
-                    playSoundButton.textContent = 'Pause Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_on.png")';
+
                 }
                 isPlaying = !isPlaying;
                 sessionStorage.setItem('isPlaying', isPlaying);

@@ -275,7 +275,7 @@
         const leftHalf = document.getElementById('left-half');
         const rightHalf = document.getElementById('right-half');
         const progressText = document.getElementById('progress-text');
-        
+
         const angle = percent * 3.6;
 
         if (percent <= 50) {
@@ -288,7 +288,7 @@
             rightHalf.style.transform = `rotate(180deg)`;
             leftHalf.style.transform = `rotate(${angle}deg)`;
         }
-        
+
         progressText.textContent = `${percent}%`;
     }
 

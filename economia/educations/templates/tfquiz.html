@@ -21,6 +21,7 @@
   <main>
     
     <div class="wrap-container">
+      <img class="magic" src="{% static 'images/magic.gif' %}" alt="" style="display:none;">
       <img class="mychar" src="{{ character_img }}" alt="char" />
       <div id="question-container" class="question-container">
         <h1 id="question-text">여기에 질문이 표시됩니다.</h1>
@@ -31,7 +32,7 @@
         <input type="hidden" id="chapter" value="{{ chapter|default:'1' }}">
       </div>
       <div class="char">
-        
+        <img class="enemy_magic" src="{% static 'images/magic.gif' %}" alt="" style="display:none;">
       <img class="enemy" src="{% static 'images/enemy1.png' %}" alt="">
       <div class="hp-bar-container">
         <div id="hp-bar" class="hp-bar"></div>

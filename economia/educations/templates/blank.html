@@ -13,7 +13,7 @@
     {% include 'quiz_header2.html' %}
     <audio id="myAudio" src="{% static random_sound %}" preload="auto"></audio>
 
-    <button id="playSoundButton">Play Sound</button>
+    <button id="playSoundButton"></button>
     <div class="life">
         <img id="lp1" src="{% static 'images/lp.png' %}" alt="lp">
         <img id="lp2" src="{% static 'images/lp.png' %}" alt="lp">
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     <img class="enemy_magic" src="{% static 'images/magic.gif' %}" alt="" style="display:none;">
-                    <img class="ccc" src="{% static 'images/enemy1.png' %}" alt="char" />
+                    <img class="enemy_char" src="{% static 'images/enemy3.png' %}" alt="char" />
                     <div class="hp-bar-container">
                         <div id="hp-bar" class="hp-bar" style="width: {{ hp_percentage }}%;"></div>
                     </div>
@@ -85,7 +85,6 @@
                 if (data.status === 'complete') {
                     document.querySelector('.enemy_magic').style.display = 'block';
                     document.querySelector('.enemy_char').classList.add('wrong');
-
                     setTimeout(function() {
                         alert(data.message);
                         window.location.href = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
@@ -102,7 +101,7 @@
                 } else {
                     alert(data.message);
                     document.querySelector('.enemy_magic').style.display = 'block';
-                    /*document.querySelector('.enemy_char').classList.add('wrong');*/
+                    document.querySelector('.enemy_char').classList.add('wrong');
                     setTimeout(function() {
                         window.location.href = `/educations/blank/${characters}/${subjects_id}/${chapter}/${num + 1}`;
                     }, 1000);
@@ -120,6 +119,7 @@
 
         document.addEventListener('DOMContentLoaded', (event) => {
             const wrongcount = "{{ wrong_count }}";
+            const correctcount = "{{correct_count}}";
 
             if (wrongcount == 1) {
                 document.getElementById('lp1').style.display = 'none';
@@ -133,6 +133,10 @@
                 alert("클리어 실패!! 난이도 선택 화면으로 돌아갑니다");
                 var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
                 window.location.href = levelChoiceUrl;
+            }
+
+            if (correctcount == 5){
+
             }
 
             const playSoundButton = document.getElementById('playSoundButton');
@@ -151,18 +155,21 @@
                 if (localStorage.getItem('isPlaying') === 'true') {
                     audio.currentTime = parseFloat(localStorage.getItem('currentTime')) || 0;
                     audio.play();
-                    playSoundButton.textContent = 'Pause Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_on.png")';
                     isPlaying = true;
+                }
+                else{
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_off.png")';
                 }
             }
 
             playSoundButton.addEventListener('click', () => {
                 if (isPlaying) {
                     audio.pause();
-                    playSoundButton.textContent = 'Play Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_off.png")';
                 } else {
                     audio.play();
-                    playSoundButton.textContent = 'Pause Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_on.png")';
                 }
                 isPlaying = !isPlaying;
                 localStorage.setItem('isPlaying', isPlaying);

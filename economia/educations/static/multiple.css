@@ -5,7 +5,7 @@ main{
 	position : relative;
 	display: flex;
 	justify-content : center;
-	font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'omyu_pretty' ;
 	text-align: center;
 
 }
@@ -24,7 +24,7 @@ body{
     color: black;
     text-align: left;
     font-size: 25px;
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'omyu_pretty' ;
 	margin-left: auto;
 	margin-right: auto;
 	padding: 20px;
@@ -46,9 +46,9 @@ body{
 	bottom: 15%;
 	right: 5%;
 }
-.character img{
-    height: 20vh;
-	width: 10vw;
+.enemy_char{
+    height: 35vh;
+	width: 15vw;
 }
 
   
@@ -64,7 +64,7 @@ body{
     text-align: left;
     padding: 0 20px;
     font-size: 25px;
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'omyu_pretty' ;
     cursor: pointer;
 	margin-left: 40px;
     transition: background-color 0.3s, color 0.3s;
@@ -92,7 +92,7 @@ body{
 	border-bottom-right-radius:20px;
 	cursor: pointer;
 	transition: background-color 0.3s ease;
-	font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'omyu_pretty' ;
 	margin-right: -600px;
 }
 
@@ -166,10 +166,20 @@ body{
 }
 .enemy_char.wrong{
 	filter: invert(100%);
+	animation: vibration .1s infinite;
 }
+@keyframes vibration {
+	from {
+	  transform: rotate(5deg);
+	}
+	to {
+	  transform: rotate(-5deg);
+	}
+  }
 
 .mychar.wrong{
 	filter: invert(100%);
+	animation: vibration .1s infinite;
 }
 
 .answer-bubble .ans{
@@ -218,10 +228,20 @@ body{
 	border-bottom-right-radius:20px;
 	cursor: pointer;
 	transition: background-color 0.3s ease;
-	font-family: 'Noto Sans KR', sans-serif; 
+    font-family: 'omyu_pretty' ;
 	float: right;
 }
 .next:hover {
 	background-color: #1A85D6; 
 	color: #E0E0E0; 
 	}
+
+#playSoundButton{
+	background-image: url(images/music_off.png) ;
+	background-repeat : no-repeat;
+	background-size: cover;
+	background-color: transparent;
+	border: none;
+	width: 50px;
+	height: 50px;
+}

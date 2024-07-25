@@ -58,7 +58,7 @@
                     if (timeLeft <= 0) {
                         clearInterval(timerInterval);
                         $('#timer').removeClass('active');
-                        $('#message').text('인증 시간이 만료되었습니다. 다시 시도해주세요.');
+                        $('#message').html('<span class="error-message">인증 시간이 만료되었습니다. 다시 시도해주세요.</span>');
                         $('#resend-btn').prop('disabled', false);
                     }
                 }, 1000);
@@ -82,11 +82,11 @@
                             startTimer();  // 타이머 시작
                         },
                         error: function(xhr, status, error) {
-                            $('#message').text('재전송 요청 중 오류가 발생했습니다.');
+                            $('#message').html('<span class="error-message">재전송 중 오류가 발생하였습니다.</span>');
                         }
                     });
                 } else {
-                    $('#message').text('이메일을 입력하세요.');
+                    $('#message').html('<span class="error-message">이메일을 입력하세요.</span>');
                 }
             });
 
