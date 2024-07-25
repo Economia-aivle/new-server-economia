@@ -5,50 +5,52 @@
   font-style: bold;
 }
 
+:root {
+  --primary-color: #43BEEE;
+  --background-color: #E0F4FF;
+  --text-color: #333;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'omyu_pretty';
+  font-family: 'omyu_pretty', sans-serif;
 }
 
 body {
-  background-color: rgba(224, 244, 255, 1);
+  background-color: var(--background-color);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
+  padding: 20px;
 }
 
 .container {
-  background-color: rgba(224, 244, 255, 1);
   width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  max-width: 500px;
 }
 
 .white_box {
-  background-color: rgba(255, 255, 255, 1);
+  background-color: #fff;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  border-radius: 20px;
+  padding: 100px;
+  width: 100%;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 8px;
-  border-radius: 20px;
-  padding: 10px;
-  width: 55%;
-  height: 55%;
 }
 
 .title_find_id {
-  color: rgba(0, 0, 0, 1);
-  width: 100%;
-  font-size: 50px;
+  color: var(--text-color);
+  font-size: 2.5rem;
   font-weight: bold;
   text-align: center;
-  padding-bottom: 40px;
-  margin-top: 40px;
+  margin-bottom: 30px;
 }
 
 .input_container {
@@ -60,100 +62,96 @@ body {
 
 .email_input_group {
   display: flex;
+  flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 800px;
-  margin-bottom: 30px;
-}
-
-.email_input_group input {
-  flex: 1;
-  height: 36px;
-  border: none;
-  padding: 8px;
-  font-size: 24px;
-  outline: none;
-  border-bottom: 3px solid rgba(217, 217, 217, 1);
-}
-
-#resend-btn {
-  box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.25);
-  background-color: rgba(57, 167, 255, 1);
-  border-radius: 15px;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  transition: background-color 0.1s;
-  width: 100px;
-  height: 48px;
-  color: rgba(255, 255, 255, 1);
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  margin-left: 10px;
   margin-bottom: 20px;
 }
 
 .input_container input {
-  width: 80%;
-  max-width: 400px;
-  height: 36px;
+  width: 100%;
+  height: 50px;
   border: none;
-  padding: 8px;
-  font-size: 24px;
+  border-bottom: 2px solid #ddd;
+  font-size: 1.1rem;
+  padding: 10px;
+  transition: border-color 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.input_container input:focus {
+  border-color: var(--primary-color);
   outline: none;
-  border-bottom: 3px solid rgba(217, 217, 217, 1);
-  margin-bottom: 30px;
+}
+
+#resend-btn, #check-btn {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+#resend-btn {
+  width: 100%;
+  max-width: 200px;
+  margin-top: 20px;
 }
 
 #check-btn {
-  box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.25);
-  background-color: rgba(57, 167, 255, 1);
-  border-radius: 15px;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  transition: background-color 0.1s;
   width: 100%;
-  max-width: 400px;
-  height: 48px;
-  color: rgba(255, 255, 255, 1);
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 40px;
+  max-width: 200px;
+  margin-top: 20px;
+}
+
+#resend-btn:hover, #check-btn:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px var(--shadow-color);
 }
 
 @media (max-width: 768px) {
   .white_box {
-    width: 90vw;
-    height: auto;
+    padding: 30px;
+  }
+
+  .title_find_id {
+    font-size: 2rem;
+  }
+
+  .input_container input {
+    font-size: 1rem;
+  }
+
+  #resend-btn, #check-btn {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .white_box {
     padding: 20px;
   }
 
   .title_find_id {
-    font-size: 40px;
-    margin-bottom: 20px;
+    font-size: 1.8rem;
   }
 
   .input_container input {
-    font-size: 18px;
-    width: 100%;
+    margin-bottom: 10px;
   }
 
-  #check-btn {
-    width: 100%;
-    height: 60px;
-    font-size: 18px;
+  #resend-btn, #check-btn {
+    max-width: 100%;
   }
+}
 
-  .email_input_group input {
-    width: 60%;
-  }
-
-  #resend-btn {
-    width: 80px;
-    height: 36px;
-    font-size: 18px;
-  }
+.error-message {
+    color: #FF5B4A;
+    font-size: 20px;
 }
