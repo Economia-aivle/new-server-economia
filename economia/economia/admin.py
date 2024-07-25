@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Player, NoticeBoard, Qna
+from .models import Player, NoticeBoard, Qna, Subjects
 from django import forms
 
 class PlayerAdmin(UserAdmin):
@@ -26,6 +26,8 @@ class PlayerAdmin(UserAdmin):
         }),
     )
 
+admin.site.register(Player, PlayerAdmin)
+
 @admin.register(NoticeBoard)
 class NoticeBoardAdmin(admin.ModelAdmin):
     list_display = ('title', 'texts', 'write_time', 'admin')
@@ -46,4 +48,7 @@ class QnaAdmin(admin.ModelAdmin):
     list_filter = ('time', 'player')
     date_hierarchy = 'time'
 
-admin.site.register(Player, PlayerAdmin)
+@admin.register(Subjects)
+class SubjectsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'subjects', 'chapters')
+    search_fields = ('subjects', 'chapters')

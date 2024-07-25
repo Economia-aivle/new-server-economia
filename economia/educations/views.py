@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 import random
 import jwt
+import json
 from django.contrib.sessions.models import Session
 
 from langchain.vectorstores import Chroma, FAISS
@@ -19,6 +20,24 @@ from langchain.chat_models import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
+
+from transformers import TextStreamer, AutoModelForCausalLM, AutoTokenizer, StoppingCriteria, StoppingCriteriaList
+
+#챗봇
+# 모델과 토크나이져 로드
+model_name = "harangstar/Llama3"
+model = AutoModelForCausalLM.from_pretrained(model_name).to("cpu")
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+alpaca_prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+### Instruction:
+{}
+
+### Response:
+{}"""
+
+
 
 embeddings = HuggingFaceEmbeddings(
     model_name='jhgan/ko-sroberta-nli', # 최신버전 : jhgan/ko-sroberta-multitask - https://github.com/jhgan00/ko-sentence-transformers?tab=readme-ov-file 참조
@@ -530,6 +549,33 @@ def wrong_explanation(request):
 
 def chapter_summary(request):
     return render(request,'chapter_summary.html')
+
+def chatbot(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            message = data.get('message', '')
+            inputs = tokenizer(
+                [
+                    alpaca_prompt.format(
+                        message,  # 지시사항
+                        "",  # 출력 - 생성을 위해 이 부분을 비워둡니다!
+                    )
+                ],
+                return_tensors="pt",
+            ).to("cpu")
+
+            text_streamer = TextStreamer(tokenizer)
+            output = model.generate(
+                **inputs,
+                streamer=text_streamer,
+                max_new_tokens=50,  # 생성할 토큰 수
+            )
+            
+            return JsonResponse({'response': output})
+        except json.JSONDecodeError:
+            return JsonResponse({'error': '잘못된 JSON 형식입니다.'}, status=400)
+    return JsonResponse({'error': '잘못된 요청 방법입니다.'}, status=405)
 
 def chapter(request, subjects):
     response = requests.get(f'http://127.0.0.1:8000/educations/getSubjectDatas/{subjects}/')

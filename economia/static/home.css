@@ -17,14 +17,33 @@ body, html {
     font-family: 'omyu_pretty';
 }
 
-img {border: none;}
-
 .search {
     width: 20px;
     height: 20px;
-    
- 
 }
+
+.chatbot-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    position: relative;
+    background-image: url("/static/images/chatbot.png");
+    background-size: cover;
+    background-position: center;
+    background-color: transparent;
+    left: 20%;
+    cursor: pointer;
+}
+
+.chatbot-button:hover {
+    transform: scale(1.1); /* 버튼을 10% 확대 */
+}
+
+.chatbot-button:active {
+    transform: scale(0.95); /* 버튼을 5% 축소 */
+    box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.3); /* 클릭 시 내부 그림자 효과 */
+}
+
 
 .image-button {
     background-image: url("/static/images/search.png");
