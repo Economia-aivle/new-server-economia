@@ -294,13 +294,15 @@ def previous_scenario(request, id):
             'player_nickname': child.characters.player.nickname,  # Player 닉네임 추가
             'img' : child.imgfile
         })
-    
+    sce = Scenario.objects.get(id = id)
+    ai_answer = sce.ai_answer
     context = {
         'scenario': scenario_data,
         'comment': comment_data_updated,
         'childcomment': childcomment_data,
         'characters_id' : characters_id,
         'has_character_comment': has_character_comment,
+        'ai_answer': ai_answer,
     }
     
     return render(request, 'previous_scenario.html', context)

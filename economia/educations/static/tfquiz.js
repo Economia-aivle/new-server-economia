@@ -137,9 +137,6 @@ function submitAnswer(answer) {
        
         console.log(correctCount)
         if (correctCount === 5) {
-            document.querySelector('.wrap-container').style.display = 'none';
-            document.querySelector('.wrong-container').style.display = 'block';
-            document.getElementById('question-text').style.display = 'none';
             alert('스테이지 클리어!!!');
             // 모든 문제를 맞췄을 때 Stage 모델 업데이트 요청
             fetch('/educations/update_stage/', {

@@ -131,7 +131,7 @@ class ChildComments(models.Model):
         db_table = 'child_comments'
 
 class Comments(models.Model):
-    scenario = models.ForeignKey('Scenario', models.DO_NOTHING)
+    scenario = models.ForeignKey('Scenario', on_delete=models.CASCADE)
     characters = models.ForeignKey(Characters, on_delete=models.CASCADE)
     percents = models.IntegerField()
     texts = models.CharField(max_length=500, blank=True, null=True)
@@ -144,7 +144,7 @@ class Comments(models.Model):
 
 
 class CommentsLikes(models.Model):
-    comment = models.ForeignKey("Comments", models.DO_NOTHING)
+    comment = models.ForeignKey("Comments", on_delete=models.CASCADE)
     player = models.ForeignKey('Player', on_delete=models.CASCADE)
 
     class Meta:
@@ -269,7 +269,7 @@ class Rules(models.Model):
 
 
 class Scenario(models.Model):
-    subjects = models.ForeignKey('Subjects', models.DO_NOTHING)
+    subjects = models.ForeignKey('Subjects', on_delete=models.CASCADE)
     title = models.CharField(max_length=100, blank=True, null=True)
     question_text = models.CharField(max_length=1000, blank=True, null=True)
     ai_answer = models.CharField(max_length=1000, blank=True, null=True)
@@ -282,7 +282,7 @@ class Scenario(models.Model):
 
 class Stage(models.Model):
     characters = models.ForeignKey(Characters, on_delete=models.CASCADE)
-    subjects = models.ForeignKey('Subjects', models.DO_NOTHING)
+    subjects = models.ForeignKey('Subjects', on_delete=models.CASCADE)
     chapter = models.IntegerField(blank=True, null=True)
     chapter_sub = models.IntegerField(blank=True, null=True)
 
@@ -301,7 +301,7 @@ class Subjects(models.Model):
 
 
 class SubjectsScore(models.Model):
-    subjects = models.ForeignKey(Subjects, models.DO_NOTHING)
+    subjects = models.ForeignKey(Subjects, on_delete=models.CASCADE)
     characters = models.ForeignKey(Characters, on_delete=models.CASCADE)
     score = models.IntegerField()
 

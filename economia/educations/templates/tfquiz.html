@@ -61,19 +61,19 @@
     subjects_id: "{{ subjects_id }}", // Django 템플릿 변수를 사용하여 초기 데이터 설정
     chapter: "{{ chapter }}",
     characters: "{{ characters }}",
-    levelurl: "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}"
+    levelurl: "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}"
   };
 
   window.onload = function() {
 
 
     function redirectToLevelChoice() {
-        var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+        var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
         window.location.href = levelChoiceUrl;
     }
 
     var currentUrl = window.location.href;
-    var levelChoiceUrlPattern = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+    var levelChoiceUrlPattern = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
 
     if (currentUrl !== levelChoiceUrlPattern) {
         history.pushState(null, null, levelChoiceUrlPattern);
@@ -88,7 +88,7 @@
 
 function nextQuestion() {
 
-      window.location.href = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+      window.location.href = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
 
 }
 </script>

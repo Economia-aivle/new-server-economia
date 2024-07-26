@@ -105,7 +105,7 @@
                     
                     setTimeout(function () {
                         alert(data.message);
-                        window.location.href = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+                        window.location.href = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
                     }, 1000);
                 } else if (data.status === 'wrong') {
                     alert(data.message);
@@ -133,7 +133,7 @@
 
         function nextQuestion() {
             const nextUrl = num >= 8 
-                ? "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}" 
+                ? "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}" 
                 : `/educations/multiple/${characters}/${subjects_id}/${chapter}/${num + 1}`;
             window.location.href = nextUrl;
         }
@@ -151,7 +151,7 @@
                 document.getElementById('lp1').style.display = 'none';
                 document.getElementById('lp2').style.display = 'none';
                 alert("클리어 실패!! 난이도 선택 화면으로 돌아갑니다");
-                var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+                var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
                 window.location.href = levelChoiceUrl;
             }
 
@@ -196,17 +196,17 @@
                 }
             }, 1000);
         });
-/*
+
         window.onload = function() {
 
 
             function redirectToLevelChoice() {
-                var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+                var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
                 window.location.href = levelChoiceUrl;
             }
         
             var currentUrl = window.location.href;
-            var levelChoiceUrlPattern = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+            var levelChoiceUrlPattern = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
         
             if (currentUrl !== levelChoiceUrlPattern) {
                 history.pushState(null, null, levelChoiceUrlPattern);
@@ -217,7 +217,7 @@
                     location.replace(levelChoiceUrlPattern);
                 }
             });
-        }; */
+        }; 
     </script>
 </body>
 </html>

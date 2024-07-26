@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Player, NoticeBoard, Qna, Subjects
+from .models import Player, NoticeBoard, Qna, Subjects, Characters, SubjectsScore
 from django import forms
 
 
@@ -76,31 +76,32 @@ with open('./documents.pkl', 'rb') as file:
 def make_chapter(cate):
     num_samples = 5  # 추출할 샘플 수
     n_total_vectors = faiss_index.ntotal  # 인덱스에 저장된 벡터 수
-    
+   
     cate_indices = []
     for doc_id, doc in faiss_vectorstore.docstore.items():
         if cate in doc.metadata.get('Cate', ''):
             cate_indices.append(doc_id)
-
-    random_indices = np.random.choice(cate_indices, num_samples, replace=False)  # 중복 없이 무작위 인덱스 선택
-
-    summary_texts = []
-    for idx in random_indices:
-        content_parts = documents[idx].page_content.split('\n', 1)
-        if len(content_parts) == 2:
-            doc_title, doc_description = content_parts
-        else:
-            doc_title = "No title available"
-            doc_description = content_parts[0]
-
-        doc_category = documents[idx].metadata['Cate']
-        summary_texts.append(f"{doc_category}: {doc_title} - {doc_description}")
-
-
-    summary_text = "\n".join(summary_texts)
-
+ 
     chapter = ''
     for i in range(8):
+        random_indices = np.random.choice(cate_indices, num_samples, replace=False)  # 중복 없이 무작위 인덱스 선택
+       
+        summary_texts = []
+        for idx in random_indices:
+            content_parts = documents[idx].page_content.split('\n', 1)
+            if len(content_parts) == 2:
+                doc_title, doc_description = content_parts
+            else:
+                doc_title = "No title available"
+                doc_description = content_parts[0]
+ 
+            doc_category = documents[idx].metadata['Cate']
+            summary_texts.append(f"{doc_category}: {doc_title} - {doc_description}")
+ 
+ 
+        summary_text = "\n".join(summary_texts)
+       
+       
         response = openai.ChatCompletion.create(
             model="gpt-4o",
             messages=[
@@ -109,20 +110,20 @@ def make_chapter(cate):
             ],
             max_tokens=300
         )
-
+ 
         # 생성된 주제 출력
         topic = response.choices[0].message.content
         pattern = r'\*\*(.+?)\*\*'
         matches = re.findall(pattern, topic)
-        
+       
         if matches:
             ai_chapter = matches[0]
         else:
-            ai_chapter = "No valid topic found"
-        
+            i -= 1
+       
         if i == 0: chapter += ai_chapter
         else: chapter = chapter + ', ' + ai_chapter
-    
+   
     return chapter
         
     
@@ -134,9 +135,18 @@ class SubjectsForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.chapters = make_chapter(instance.subjects)
         if commit:
-            instance.save()
+            try:
+                # ID를 수동으로 설정하거나 처리할 수 있는 로직
+                if not instance.pk:
+                    instance.pk = Subjects.objects.order_by('-id').first().id + 1 if Subjects.objects.exists() else 1
+                instance.chapters = make_chapter(instance.subjects)
+                instance.save()
+            except IntegrityError:
+                # ID 충돌 시 처리 로직
+                print("ID conflict. Unable to save.")
+        else:
+            instance.chapters = make_chapter(instance.subjects)
         return instance
 
 @admin.register(Subjects)

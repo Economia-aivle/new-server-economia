@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.shortcuts import get_object_or_404  
 from .form import PlayerForm
 from .models import *
 from .serializers import UserLoginSerializer, ProductSerializer, CharacterSerializer
@@ -118,6 +119,14 @@ def refresh_access_token(refresh_token):
 def home(request, subject_id):
     access_token = request.COOKIES.get('access_token')
     refresh_token = request.COOKIES.get('refresh_token')
+    decoded = jwt.decode(access_token, 'economia', algorithms=['HS256'])
+    # try:
+    #     character_id = get_player(request,'characters')
+    #     subject_instance = Subjects.objects.get(id=subject_id)
+    #     character_instance = Characters.objects.get(id=character_id)
+    #     SubjectsScore.objects.get(subjects=subject_instance, characters=character_instance)
+    # except SubjectsScore.DoesNotExist:
+    #     SubjectsScore.objects.create(subjects=subject_instance, characters=character_instance, score=0)
 
     def level(exp):
         total = int(exp)
@@ -178,6 +187,17 @@ def home(request, subject_id):
                 decoded['character_id'] = data2.id
                 create_subject_scores(data2.id)
                 return redirect('/users/char_create/'+str(decoded['user_id']),{"user":decoded})
+            else:
+                    try:
+                        character_id = get_player(request,'characters')
+                        subject_instance = Subjects.objects.get(id=subject_id)
+                        character_instance = Characters.objects.get(id=character_id)
+                        SubjectsScore.objects.get(subjects=subject_instance, characters=character_instance)
+                    except SubjectsScore.DoesNotExist:
+                        SubjectsScore.objects.create(subjects=subject_instance, characters=character_instance, score=0)
+                
+
+            
             data_character = Characters.objects.get(player_id=serializer.data['id'])
             decoded['character_id'] = data_character.id
             serializer_character = CharacterSerializer(data_character)
@@ -189,6 +209,8 @@ def home(request, subject_id):
             print("exp:",serializer_character.data['exp'])
             decoded['total'], decoded['present'], decoded['level'] = level(serializer_character.data['exp'])
             decoded['percent'] = int(100 * decoded['total'] / decoded['present'])
+                            
+                
 
             decoded['scenario_list'] = Scenario.objects.filter(subjects=subject_id).annotate(
                 rank=Window(
@@ -213,12 +235,12 @@ def home(request, subject_id):
                 decoded['chapter_tf'] = 0
             
             if blank:
-                decoded['chapter_blank'] = tf.chapter
+                decoded['chapter_blank'] = blank.chapter
             else:
                 decoded['chapter_blank'] = 0
                 
             if mul:
-                decoded['chapter_mul'] = tf.chapter
+                decoded['chapter_mul'] = mul.chapter
             else:
                 decoded['chapter_mul'] = 0
                 
@@ -358,3 +380,29 @@ class RegisterAPIView(APIView):
 
             return res
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+def get_player(request, id):
+    access_token = request.COOKIES.get('access_token')
+    refresh_token = request.COOKIES.get('refresh_token')
+
+    # 디버깅 로그 추가
+    print("Access Token:", access_token)
+    print("Refresh Token:", refresh_token)
+
+    if not access_token:
+        return JsonResponse({"error": "토큰이 없습니다."}, status=400)
+
+    decoded = jwt.decode(access_token, 'economia', algorithms=['HS256'])
+    decoded['access_token'] = access_token
+    player = Player.objects.get(player_id=decoded['player_id'])
+    player_id = player.id
+    character = get_object_or_404(Characters, player_id=player_id)
+    characters_id = character.id
+    print(characters_id)
+    print(player_id)
+    if id == 'player':
+        return player_id
+    elif id == 'characters':
+        return characters_id
+    else:
+        return player_id
