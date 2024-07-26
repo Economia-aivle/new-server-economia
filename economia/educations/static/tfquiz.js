@@ -154,7 +154,8 @@ function submitAnswer(answer) {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert('모든 문제를 맞췄습니다!');
+                    // var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
+                    // window.location.href = levelChoiceUrl;
                 } else {
                     alert('Stage 업데이트 중 오류가 발생했습니다.');
                 }
