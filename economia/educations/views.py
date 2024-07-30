@@ -29,42 +29,21 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 
 from transformers import TextStreamer, AutoModelForCausalLM, AutoTokenizer, StoppingCriteria, StoppingCriteriaList
 
-# #챗봇
-# # 모델과 토크나이져 로드
-# model_name = "harangstar/Llama3"
-# model = AutoModelForCausalLM.from_pretrained(model_name).to("cpu")
-# tokenizer = AutoTokenizer.from_pretrained(model_name)
+#챗봇
+# 모델과 토크나이져 로드
+model_name = "harangstar/Llama3"
+model = AutoModelForCausalLM.from_pretrained(model_name).to("cpu")
+tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-# alpaca_prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+alpaca_prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
 
-# ### Instruction:
-# {}
+### Instruction:
+{}
 
-# ### Response:
-# {}"""
+### Response:
+{}"""
 
-# from transformers import AutoModelForCausalLM, AutoTokenizer
-# from google.colab import drive 
-# drive.mount('/content/drive')
- 
-# model_name = "harangstar/Llama3"  # 모델 이름을 확인하세요.
- 
-# # 모델 로드
-# model = AutoModelForCausalLM.from_pretrained(model_name)
-# tokenizer = AutoTokenizer.from_pretrained(model_name)
-# save_path = '/content/drive/MyDrive/jiu/'
- 
-# # 모델과 토크나이저 저장
-# model.save_pretrained(save_path)
-# tokenizer.save_pretrained(save_path)
 
-# alpaca_prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-# ### Instruction:
-# {}
-
-# ### Response:
-# {}"""
 
 
 embedding = SentenceTransformer('jhgan/ko-sroberta-multitask')  # 임베딩 모델 가져오기
@@ -722,14 +701,7 @@ def study(request, subjects_id):
     }
     return render(request,'study.html', context)
 
-def summary_anime(request):
-    return render(request,'summary_anime.html')
 
-def wrong_explanation(request):
-    return render(request,'wrong_explanation.html')
-
-def chapter_summary(request):
-    return render(request,'chapter_summary.html')
 
 def chatbot(request):
     if request.method == 'POST':
@@ -782,8 +754,6 @@ def study_view(request):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
-def summary_anime(request):
-    return render(request, 'summary_anime.html')
 
 def get_player(request, id):
     access_token = request.COOKIES.get('access_token')

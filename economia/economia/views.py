@@ -6,14 +6,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.http import JsonResponse, HttpResponse
-from rest_framework.decorators import api_view
-from django.contrib import messages
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.shortcuts import get_object_or_404  
-from .form import PlayerForm
 from .models import *
 from .serializers import UserLoginSerializer, ProductSerializer, CharacterSerializer
 from datetime import datetime, timedelta, timezone
@@ -36,9 +31,6 @@ def admin_login(request):
             return render(request, 'admin_login.html', {'error': 'Invalid credentials or not an admin'})
     return render(request, 'admin_login.html')
 
-@login_required
-def admin_dashboard(request):
-    return render(request, 'admin_dashboard.html')
 
 class AdminLoginAPI(APIView):
     def post(self, request):
@@ -51,11 +43,6 @@ class AdminLoginAPI(APIView):
         else:
             return Response({"error": "Invalid credentials or not an admin"}, status=status.HTTP_400_BAD_REQUEST)
 
-def index(request):
-    return render(request, 'index.html')
-
-def chapter(request):
-    return render(request, 'chapter.html')
 
 def mypage(request):
     access_token = request.COOKIES.get('access_token')
@@ -68,12 +55,6 @@ def onboarding(request):
 
 def update_info(request):
     return render(request, 'update_info.html')
-
-def is_token_blacklisted(token):
-    try:
-        return BlacklistedToken.objects.filter(token=token).exists()
-    except TokenError:
-        return True
 
 class LoginView(APIView):
     def post(self, request):
@@ -120,13 +101,6 @@ def home(request, subject_id):
     access_token = request.COOKIES.get('access_token')
     refresh_token = request.COOKIES.get('refresh_token')
     decoded = jwt.decode(access_token, 'economia', algorithms=['HS256'])
-    # try:
-    #     character_id = get_player(request,'characters')
-    #     subject_instance = Subjects.objects.get(id=subject_id)
-    #     character_instance = Characters.objects.get(id=character_id)
-    #     SubjectsScore.objects.get(subjects=subject_instance, characters=character_instance)
-    # except SubjectsScore.DoesNotExist:
-    #     SubjectsScore.objects.create(subjects=subject_instance, characters=character_instance, score=0)
 
     def level(exp):
         total = int(exp)
@@ -303,13 +277,6 @@ def home(request, subject_id):
             return HttpResponse('Invalid token', status=401)
 
 
-
-def char_create(request):
-    return render(request, 'char_create.html')
-
-def char_delete(request):
-    return render(request, 'char_delete.html')
-
 def check_username(request):
     if request.method == 'POST':
         user_id = request.POST.get('user_id')
@@ -380,6 +347,9 @@ class RegisterAPIView(APIView):
 
             return res
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+def chapter(request):
+    return render(request,'chpater.html')
     
 def get_player(request, id):
     access_token = request.COOKIES.get('access_token')

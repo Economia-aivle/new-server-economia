@@ -1,4 +1,4 @@
-settings.py
+
 *.idea
 *.pyc
 __pycache__/
