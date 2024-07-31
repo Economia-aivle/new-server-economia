@@ -31,9 +31,14 @@
 
 </br>
 
-### ✔️ 서비스 플로우</br></br>
-![workflow (1) 1](https://github.com/user-attachments/assets/5b1b2f40-da19-4270-a1cf-b353e4b2d483)
+### ✔️ 시스템 아키텍쳐</br></br>
+![아키텍쳐 정의서 (4)](https://github.com/user-attachments/assets/f5fe8ce0-6a83-4985-bb16-3a435a5146d4)
 </br></br>
 
 ### ✔️ ERD</br></br>
 ![erd 1](https://github.com/user-attachments/assets/e08cf935-af1e-4060-a88a-c7ee416ad33e)
+</br></br>
+
+### ✔️ 서비스 플로우</br></br>
+![workflow (1) 1](https://github.com/user-attachments/assets/5b1b2f40-da19-4270-a1cf-b353e4b2d483)
+
