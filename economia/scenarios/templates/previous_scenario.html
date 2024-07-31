@@ -14,18 +14,7 @@
         <div class="scenario_container">
             <span class="title">시나리오</span><br>
             {% for item in scenario %}
-             <span class="contents">   <!-- {{ item.question_text }} -->
-                    한 마을에 A와 B가 살고 있다. 이 마을에는 가로등이 없어 A와 B는 불편함을 겪고 있다. 답답했던 두 사람은 마을 회의에서가로등 설치에 대해 투표하기로 했다. 가로등 설치비는 개당 300만 원이고, ‘설치’에 투표한 사람만 비용을 부담하게 된다. 일단 가로등이 설치되면 비용을 내지 않은 사람도 그로 인한 이익을 누릴 수 있다.<br> 
-                    만약 A와 B가 모두 ‘설치’에 투표한다면 가로등은 2개가 설치되고, 그로부터 A와 B가 얻는 이익을 화폐 단위로 환산하면 각각 500만 원이다. 만약 A만 ‘설치’에 투표한다면 가로등은 1개만 설치되므로, 2개인 경우에 비해 불빛이 줄어들어 그로부터 얻는 이익은 각각 250만 원으로 줄어든다. 이때 A는 50만 원의 손해(=250만 원-300만 원)를 입게 되고, 비용을 부담하지 않은 B는 250만 원의 이익만 얻게 된다. 만약 모두 ‘미설치’에 투표할 경우 가로등은 설치되지 않는다.
-                   <br><br>
-                   ① 마음: A가 ‘설치’에 투표한다면 B도 ‘설치’에 투표하는 것이 이득이라 생각해.<br>
-                   ② 바다: A와 B가 합리적으로 행동한다면 모두 ‘설치’에 투표하는게 좋아.<br>
-                   ③ 사랑: B가 ‘미설치’에 투표하고 A가 ‘설치’에 투표하면 A는 0을 얻게 돼.<br>
-                   ④ 아름: B가 무슨 선택을 하든지 A는 ‘미설치’에 투표하는 게 항상 이득이야.<br>
-                   <br>
-                    네 명의 사람이 서로 다른 전략을 생각하고 있다. 단, 틀린 전략도 있을 수 있다.
-                   위의 전략을 참고해서 당신만의 전략을 답변으로 적어보자.
-                    당신은 어떤 전략을 펼칠 것인가?
+             <span class="contents">{{ item.question_text }}
                 </span>
             {% endfor %}
         </div>
@@ -47,11 +36,9 @@
             {% endfor %}
         {% else %}
             <div class="ai_comment_box">
-                <span class="ai_comment_title">AI 답변</span>
+                <span class="ai_comment_title">AI 답변:<br> {{ ai_answer }}</span>
             </div>
             <div class="comment_box_head">
-                <span class="comment_box_head_same"><input type="button" value="유사도순"></span>|
-                <span class="comment_box_head_like"><input type="button" value="좋아요순"> </span>
             </div>
             {% for item in comment %}
                 <div class="comment_box1">
@@ -60,7 +47,7 @@
                             <form method="post" action="{% url 'scenarios:delete_comment' item.id %}" class="deleteForm">
                                 {% csrf_token %}
                                 <input type="hidden" name="scenario_id" value="{{ scenario.0.id }}">
-                                <button type="submit" class="delete_button">삭제</button>
+                                <button type="submRit" class="delete_button">삭제</button>
                             </form>
                         {% endif %}
                         <button id="like-btn-{{ item.id }}" class="like-btn" data-comment-id="{{ item.id }}" data-action="{% if item.is_liked_by_user %}unliked{% else %}liked{% endif %}">

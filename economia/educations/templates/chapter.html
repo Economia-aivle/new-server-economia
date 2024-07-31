@@ -22,7 +22,7 @@
       <div class="chapters">
         {% for item in chapter %}
         {% for part in item.chapters_list %}
-        <button class="chap{{ item.id }}" onclick="location.href='{% url 'educations:level_choice' characters=characters subjects_id=item.id chapter=forloop.counter %}'">
+        <button class="chap{{ item.id }}" onclick="location.href='{% url 'educations:level_choice' characters=characters subjects=item.subjects chapter=forloop.counter %}'">
                 <p>Chapter {{ forloop.counter }}</p>
             </button><br>
         {% endfor %}

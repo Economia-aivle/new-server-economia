@@ -1,5 +1,6 @@
-settings.py
+
 *.idea
 *.pyc
 __pycache__/
 DB_chroma
+django_debug.log

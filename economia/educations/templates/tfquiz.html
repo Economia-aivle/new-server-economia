@@ -13,7 +13,7 @@
   <audio id="myAudio" src="{% static  random_sound %}" preload="auto"></audio>
 
   <!-- 버튼을 클릭하여 소리를 재생/일시정지 -->
-  <button id="playSoundButton">Play Sound</button>
+  <button id="playSoundButton"></button>
   <div class="life">
       <img id="lp1" src="{% static 'images/lp.png' %}" alt="lp">
       <img id="lp2" src="{% static 'images/lp.png' %}" alt="lp">
@@ -43,10 +43,10 @@
     
     <div class="wrong-container" id="wrong-container" style="display:none;">
       <div class="answer-bubble">
-          <p class="ans">모든 문제를 맞췄습니다!</p>
+          <p class="ans">클리어 실패!!!</p>
       </div>
       <div class="character">
-          <img src="{{ character_img }}" alt="char" />
+          <img class="enemy_f" src="{{ character_img_f }}" alt="char" />
       </div>
       <div class="next-button-container">
           <button class="next" id="next-btn" onclick="nextQuestion()">Finish</button>
@@ -61,19 +61,19 @@
     subjects_id: "{{ subjects_id }}", // Django 템플릿 변수를 사용하여 초기 데이터 설정
     chapter: "{{ chapter }}",
     characters: "{{ characters }}",
-    levelurl: "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}"
+    levelurl: "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}"
   };
 
   window.onload = function() {
 
 
     function redirectToLevelChoice() {
-        var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+        var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
         window.location.href = levelChoiceUrl;
     }
 
     var currentUrl = window.location.href;
-    var levelChoiceUrlPattern = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+    var levelChoiceUrlPattern = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
 
     if (currentUrl !== levelChoiceUrlPattern) {
         history.pushState(null, null, levelChoiceUrlPattern);
@@ -88,7 +88,7 @@
 
 function nextQuestion() {
 
-      window.location.href = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+      window.location.href = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
 
 }
 </script>

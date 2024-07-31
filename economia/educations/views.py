@@ -13,11 +13,17 @@ import jwt
 import json
 from django.contrib.sessions.models import Session
 
-from langchain.vectorstores import Chroma, FAISS
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.chat_models import ChatOpenAI
+import numpy as np
+import openai
+import faiss
+import pickle
+import re
 
 from langchain_core.prompts import PromptTemplate
+from langchain.chat_models import ChatOpenAI
+from langchain.vectorstores import FAISS
+from sentence_transformers import SentenceTransformer
+
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
 
@@ -39,29 +45,86 @@ alpaca_prompt = """Below is an instruction that describes a task. Write a respon
 
 
 
-embeddings = HuggingFaceEmbeddings(
-    model_name='jhgan/ko-sroberta-nli', # 최신버전 : jhgan/ko-sroberta-multitask - https://github.com/jhgan00/ko-sentence-transformers?tab=readme-ov-file 참조
-    model_kwargs={'device':'cpu'},
-    encode_kwargs={'normalize_embeddings':True},
-)
 
-# faiss_db = FAISS.load_local('./DB_faiss', embeddings, allow_dangerous_deserialization=True)
-chroma_db = Chroma(persist_directory='./DB_chroma', embedding_function=embeddings)  # educations와 같은 폴더에 db 저장해야 함.
-chat = ChatOpenAI(model='gpt-4o', temperature=1.0)
+embedding = SentenceTransformer('jhgan/ko-sroberta-multitask')  # 임베딩 모델 가져오기
+faiss_vectorstore = FAISS.load_local('./faiss_jiwoo', embedding, allow_dangerous_deserialization=True)
+faiss_index = faiss.read_index('./faiss_index.bin')
+
+with open('./documents.pkl', 'rb') as file:
+    documents = pickle.load(file)
+
+class Retriever:
+    @staticmethod
+    def retrieve(cate, chap):
+
+        cate_indices = []
+        for doc_id, doc in faiss_vectorstore.docstore.items():
+            if cate in doc.metadata.get('Cate', ''):
+                cate_indices.append(doc_id)
+
+        print(f"{cate} 카테고리에 속하는 문서 수: {len(cate_indices)}")
+
+        # '금융' 카테고리에 속하는 문서들의 임베딩만 추출
+        filtered_embeddings = np.array([faiss_vectorstore.index.reconstruct(doc_id) for doc_id in cate_indices])
+
+        # 쿼리 임베딩 생성
+        query_embedding = embedding.encode([chap]).reshape(1, -1)
+
+        # '금융' 카테고리에 속하는 문서들 중에서 검색 수행
+        D, I = faiss_vectorstore.index.search(query_embedding, len(filtered_embeddings))
+
+        # 거리 D를 유사도로 변환
+        similarities = 1 / (1 + D[0])
+
+        # 유사도 기반으로 '금융' 카테고리 문서 필터링 및 결과 저장
+        results = []
+        for i in range(len(I[0])):
+            if I[0][i] < len(cate_indices):
+                doc_id = cate_indices[I[0][i]]  # 필터링된 인덱스에서 원래 문서 인덱스 가져오기
+                doc = faiss_vectorstore.docstore[doc_id]
+                similarity = similarities[i]
+
+                results.append({
+                    'score': similarity,
+                    'content': doc.page_content,
+                    'metadata': doc.metadata
+                })
+
+        print(f"최종 결과 문서 수: {len(results)}")
+
+        random_results = random.sample(results, min(5, len(results)))
+
+        results_dict = {'documents': []}
+        # 랜덤으로 선택된 결과 출력
+        for result in random_results:
+            results_dict['documents'].append(result['content'])
+
+        return results_dict
 
 class selc_question_form(BaseModel):
     question: list = Field(description="문제")
     exam: list = Field(description="보기")
     ans: list = Field(description="답")
+    expl : list = Field(description="설명")
     
 class question_form(BaseModel):
     question: list = Field(description="문제")
     ans: list = Field(description="답")
+    expl : list = Field(description="설명")
 
-query_set = ['Documents마다 OX 문제와 답 한 개씩 총 8문제를 만들어줘.', 
-             'Documents마다 보기가 4개인 문제와 답 한 개씩 총 8문제를 한국어로 만들어줘. 보기는 숫자를 포함해서 표시해줘. 답은 int형으로 숫자만 알려줘. 중복 답은 없도록 해줘.',
-             'Documents마다 빈칸 문제와 답 한 개씩 총 8문제를 만들어줘.', 
+query_set = query_set = ['''Documents마다 OX 문제와 답, 문제를 푸는 설명 한 개씩 총 8문제를 만들어줘.
+             문제는 question에, 답은 ans에, 설명은 expl에 넣어줘.
+             문제는 번호없이 만들어줘.''', 
+             '''Documents마다 보기가 4개인 문제와 답, 문제를 푸는 설명 한 개씩 총 8문제를 한국어로 만들어줘. 
+             보기는 숫자를 포함해서 표시해줘. 답은 int형으로 숫자만 알려줘. 중복 답은 없도록 해줘.
+             문제는 question에, 보기는 exam에, 답은 ans에, 설명은 expl에 넣어줘.
+             문제는 번호없이 만들어줘.''',
+             '''Documents마다 빈칸 맞추는 문제와 답, 문제를 푸는 설명 한 개씩 총 8문제를 만들어줘. 
+             답은 영어가 없는 명사로 만들어줘. 중복 답은 없도록 해줘.
+             문제는 question에, 답은 ans에, 설명은 expl에 넣어줘.
+             문제는 번호없이 만들어줘.''',
              ]
+
 
 form_set = [question_form, selc_question_form, question_form]
 
@@ -111,7 +174,29 @@ def previous_quiz(request, characters):
     tf_response = requests.get(f'http://127.0.0.1:8000/educations/tfdatas/{characters}')
     tf_data = tf_response.json()
     
+    for item in blank_data:
+        subject_id = item.get('subjects')
+        if subject_id:
+            subject_instance = Subjects.objects.filter(id=subject_id).first()
+            if subject_instance:
+                item['subjects'] = subject_instance.subjects
+                
+    for item in tf_data:
+        subject_id = item.get('subjects')
+        if subject_id:
+            subject_instance = Subjects.objects.filter(id=subject_id).first()
+            if subject_instance:
+                item['subjects'] = subject_instance.subjects
+                
+    for item in multiple_data:
+        subject_id = item.get('subjects')
+        if subject_id:
+            subject_instance = Subjects.objects.filter(id=subject_id).first()
+            if subject_instance:
+                item['subjects'] = subject_instance.subjects
+    
     subject_list = Subjects.objects.values_list('subjects', flat=True)
+
     
     # 템플릿에 데이터를 전달
     context = {
@@ -132,11 +217,12 @@ def previous_quiz_answer(request, characters):
     return render(request, 'previous_quiz_answer.html', {'multiple': data})
 
 # Create your views here.
-def level_choice(request, characters, subjects_id, chapter):
+def level_choice(request, characters, subjects, chapter):
     chapter = int(chapter)
-    response = requests.get(f'http://127.0.0.1:8000/educations/getSubjectDatas/{subjects_id}/')
+    response = requests.get(f'http://127.0.0.1:8000/educations/getSubjectDatas/{subjects}/')
     data = response.json()
-    
+    sub = Subjects.objects.get(subjects=subjects)
+    subjects_id = sub.id
     # characters 정보 가져오기
     characters = get_player(request, 'characters')
     
@@ -168,28 +254,30 @@ def level_choice(request, characters, subjects_id, chapter):
     
     return render(request, 'level_choice.html', context)
 
-def make_questions(cate, q_type): # 숫자로 받을만 하지 않을까? 지금은 0: OX     1: 객관식   2: 빈칸 순서임
-    db = chroma_db.get(where={'category': cate})
-    
-    docs = random.sample(db['documents'], 8)
-
-    output_parser = JsonOutputParser(pydantic_object=form_set[q_type])
+def make_qa(cate, chap, type_n):
+# 출력 파서 정의
+    output_parser = JsonOutputParser(pydantic_object=form_set[type_n])    # 지정된 pydantic 모델에 맞게 데이터를 구조화하여 제공
     format_instructions = output_parser.get_format_instructions()
+    query = query_set[type_n]
 
-    query = query_set[q_type]
     template = '''
-    아래의 자료만을 사용하여 질문에 답하세요: 
-    {docs}
-    답변은 해당 형식에 맞게 모아서 만들어주세요:
-    {form}
+        아래의 자료만을 사용하여 질문에 답하세요: 
+        {context}
+        답변은 해당 형식에 맞게 모아서 만들어주세요:
+        {form}
 
-    질문: {query}
-    '''
+        질문: 중학교 수준의 문제를 만들어줘. {question}
+        '''
 
+
+    model = ChatOpenAI(model="gpt-4o", temperature=0.5)
+
+    # query = "수출입은행의 역할과 중요성 교육"
+    results = Retriever.retrieve(cate, chap)
     prompt = PromptTemplate.from_template(template)
 
-    chain = prompt | chat | output_parser
-    res = chain.invoke({'docs': docs, 'form':format_instructions, 'query': query})
+    chain = prompt | model | output_parser
+    res = chain.invoke({'context': results['documents'], 'form':format_instructions, 'question': query})
     return res
 
 
@@ -276,9 +364,28 @@ def tf_quiz_page(request, subjects_id, chapter):
     sounds = ['sounds/back_sound1.mp3', 'sounds/back_sound2.mp3', 'sounds/back_sound3.mp3']
     random_sound = random.choice(sounds)
     print(character_img)
-    result = make_questions('금융', 0)
+    
+    if 'char1' in character_img:
+        character_img_f = character_img.replace('char1', 'char1 f')
+    elif 'char2' in character_img:
+        character_img_f = character_img.replace('char2', 'char2 f')
+    elif 'char3' in character_img:
+        character_img_f = character_img.replace('char3', 'char3 f')
+    elif 'char4' in character_img:
+        character_img_f = character_img.replace('char4', 'char4 f')
+    elif 'char5' in character_img:
+        character_img_f = character_img.replace('char5', 'char5 f')
+    else:
+        character_img_f = character_img  # 위 조건에 해당하지 않는 경우 원본 URL 유지
+    
+    sub = Subjects.objects.get(id=subjects_id)
+    subjects = sub.subjects
+    chapters_list = sub.chapters.split(', ')
+    chapter_name = chapters_list[int(chapter) - 1] 
+    result = make_qa(subjects, chapter_name, 0)
     m_question = result['question']
     m_ans = result['ans']
+    m_expl = result['expl']
     print(m_question)
     print(m_ans)
     
@@ -292,13 +399,16 @@ def tf_quiz_page(request, subjects_id, chapter):
     
     for i in range(8):
         Tf.objects.create(characters_id=characters, question_text=m_question[i], correct_answer=m_ans[i],
-                          subjects_id=subjects_id, chapter=chapter, explanation="123123123")
+                          subjects_id=subjects_id, chapter=chapter, explanation=m_expl[i])
     context = {
             'characters': characters,
               'subjects_id': subjects_id,
               'chapter': chapter,
               'character_img':character_img,
               'random_sound': random_sound,
+              'character_img_f': character_img_f,
+              'subjects':subjects,
+              'chapter_name':chapter_name,
     } 
     return render(request, 'tfquiz.html', context)
 
@@ -335,6 +445,22 @@ def multiple(request, characters, subjects_id, chapter, num):
     character = Characters.objects.get(id=characters)
     character_img = character.kind_url
     print(character_img)
+    sub = Subjects.objects.get(id=subjects_id)
+    subjects = sub.subjects
+    
+    if 'char1' in character_img:
+        character_img_f = character_img.replace('char1', 'char1 f')
+    elif 'char2' in character_img:
+        character_img_f = character_img.replace('char2', 'char2 f')
+    elif 'char3' in character_img:
+        character_img_f = character_img.replace('char3', 'char3 f')
+    elif 'char4' in character_img:
+        character_img_f = character_img.replace('char4', 'char4 f')
+    elif 'char5' in character_img:
+        character_img_f = character_img.replace('char5', 'char5 f')
+    else:
+        character_img_f = character_img  # 위 조건에 해당하지 않는 경우 원본 URL 유지
+    
     random_sound = 'sounds/back_sound3.mp3'
     multiple_response = requests.get(f'http://127.0.0.1:8000/educations/multipledatas/{characters}')
     multiple_data = multiple_response.json()
@@ -389,24 +515,30 @@ def multiple(request, characters, subjects_id, chapter, num):
             request.session['wrong_count'] = wrong_count
             # 오답인 경우
             return JsonResponse({'status': 'wrong', 'message': '오답입니다.'})
-    # else:
-        # if num == 1:
-            # result = make_questions('금융', 1)
-            # m_question = result['question']
-            # m_exam = result['exam']
-            # m_ans = result['ans']
-            # print(m_question)
-            # print(m_exam)
-            # print(m_ans)
+    else:
+        if num == 1:
+            sub = Subjects.objects.get(id=subjects_id)
+            subjects = sub.subjects
+            print(subjects)
+            chapters_list = sub.chapters.split(', ')
+            chapter_name = chapters_list[int(chapter) - 1] 
+            result = make_qa(subjects, chapter_name, 1)
+            m_question = result['question']
+            m_exam = result['exam']
+            m_ans = result['ans']
+            m_expl = result['expl']
+            print(m_question)
+            print(m_exam)
+            print(m_ans)
             
-            # for i in range(5):
-            #     a = m_exam[i][0]
-            #     b = m_exam[i][1]
-            #     c = m_exam[i][2]
-            #     d = m_exam[i][3]
-            #     Multiple.objects.create(characters_id=characters, question_text=m_question[i],
-            #                     option_a = a, option_b = b, option_c = c, option_d = d,
-            #                     correct_answer=int(m_ans[i]), subjects_id=subjects_id, chapter=chapter, explanation="123123123")
+            for i in range(8):
+                a = m_exam[i][0]
+                b = m_exam[i][1]
+                c = m_exam[i][2]
+                d = m_exam[i][3]
+                Multiple.objects.create(characters_id=characters, question_text=m_question[i],
+                                option_a = a, option_b = b, option_c = c, option_d = d,
+                                correct_answer=int(m_ans[i]), subjects_id=subjects_id, chapter=chapter, explanation=m_expl[i])
 
     correct_count = request.session.get('correct_count', 0)
     wrong_count = request.session.get('wrong_count', 0)
@@ -429,6 +561,8 @@ def multiple(request, characters, subjects_id, chapter, num):
               'wrong_count' : wrong_count,
               'character_img' : character_img,
               'random_sound' :random_sound,
+              'character_img_f':character_img_f,
+              'subjects':subjects,
               }
     
     
@@ -442,6 +576,23 @@ def blank(request, characters, subjects_id, chapter, num):
     character = Characters.objects.get(id=characters)
     character_img = character.kind_url
     print(character_img)
+    sub = Subjects.objects.get(id=subjects_id)
+    subjects = sub.subjects
+    
+    if 'char1' in character_img:
+        character_img_f = character_img.replace('char1', 'char1 f')
+    elif 'char2' in character_img:
+        character_img_f = character_img.replace('char2', 'char2 f')
+    elif 'char3' in character_img:
+        character_img_f = character_img.replace('char3', 'char3 f')
+    elif 'char4' in character_img:
+        character_img_f = character_img.replace('char4', 'char4 f')
+    elif 'char5' in character_img:
+        character_img_f = character_img.replace('char5', 'char5 f')
+    else:
+        character_img_f = character_img  # 위 조건에 해당하지 않는 경우 원본 URL 유지
+    
+    
     random_sound = 'sounds/back_sound2.mp3'
     problem_count = Multiple.objects.filter(characters_id=characters).count()
     if problem_count > 50:
@@ -499,17 +650,22 @@ def blank(request, characters, subjects_id, chapter, num):
             # 오답인 경우
             return JsonResponse({'status': 'wrong', 'message': '오답입니다.'})
     
-    # else:
-    #     if num == 1:
-    #         result = make_questions('금융', 2)
-    #         m_question = result['question']
-    #         m_ans = result['ans']
-    #         print(m_question)
-    #         print(m_ans)
+    else:
+        if num == 1:
+            sub = Subjects.objects.get(id=subjects_id)
+            subjects = sub.subjects
+            chapters_list = sub.chapters.split(', ')
+            chapter_name = chapters_list[int(chapter) - 1] 
+            result = result = make_qa(subjects, chapter_name, 2)
+            m_question = result['question']
+            m_ans = result['ans']
+            m_expl = result['expl']
+            print(m_question)
+            print(m_ans)
         
-    #         for i in range(5):
-    #             Blank.objects.create(characters_id=characters, question_text=m_question[i], correct_answer=m_ans[i],
-    #                             subjects_id=subjects_id, chapter=chapter, explanation="123123123")
+            for i in range(8):
+                Blank.objects.create(characters_id=characters, question_text=m_question[i], correct_answer=m_ans[i],
+                                subjects_id=subjects_id, chapter=chapter, explanation=m_expl[i])
     blank_response = requests.get(f'http://127.0.0.1:8000/educations/blankdatas/{characters}')
     blank_data = blank_response.json()
 
@@ -520,6 +676,7 @@ def blank(request, characters, subjects_id, chapter, num):
     blank_wrong_count = request.session.get('blank_wrong_count', 0)
     hp_percentage = max(0, 100 - (blank_correct_count * 20))  # 체력 퍼센트 계산
     context = {
+        'character_img_f':character_img_f,
         'question': question,
         'num': num,
         'characters': characters,
@@ -530,25 +687,21 @@ def blank(request, characters, subjects_id, chapter, num):
         'wrong_count': blank_wrong_count,
         'character_img': character_img,
         'random_sound': random_sound,
+        'subjects':subjects,
     }
 
     return render(request, 'blank.html', context)
 
     
 def study(request, subjects_id):
+    subject = Subjects.objects.get(id=subjects_id)
+    subject_name = subject.subjects
     context = {
-        'subjects_id': subjects_id,
+        'subject_name': subject_name,
     }
     return render(request,'study.html', context)
 
-def summary_anime(request):
-    return render(request,'summary_anime.html')
 
-def wrong_explanation(request):
-    return render(request,'wrong_explanation.html')
-
-def chapter_summary(request):
-    return render(request,'chapter_summary.html')
 
 def chatbot(request):
     if request.method == 'POST':
@@ -601,8 +754,6 @@ def study_view(request):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
-def summary_anime(request):
-    return render(request, 'summary_anime.html')
 
 def get_player(request, id):
     access_token = request.COOKIES.get('access_token')

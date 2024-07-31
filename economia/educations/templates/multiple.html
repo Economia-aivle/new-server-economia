@@ -31,10 +31,10 @@
                 <form id="answer-form" method="post">
                     {% csrf_token %}
                     <input type="hidden" id="answer" name="answer" value="">
-                    <button class="option-btn" type="button" id="option1" onclick="selectOption(this)" name="answer" value="1">1. {{ question.option_a }}</button>
-                    <button class="option-btn" type="button" id="option2" onclick="selectOption(this)" name="answer" value="2">2. {{ question.option_b }}</button>
-                    <button class="option-btn" type="button" id="option3" onclick="selectOption(this)" name="answer" value="3">3. {{ question.option_c }}</button>
-                    <button class="option-btn" type="button" id="option4" onclick="selectOption(this)" name="answer" value="4">4. {{ question.option_d }}</button>
+                    <button class="option-btn" type="button" id="option1" onclick="selectOption(this)" name="answer" value="1">{{ question.option_a }}</button>
+                    <button class="option-btn" type="button" id="option2" onclick="selectOption(this)" name="answer" value="2">{{ question.option_b }}</button>
+                    <button class="option-btn" type="button" id="option3" onclick="selectOption(this)" name="answer" value="3">{{ question.option_c }}</button>
+                    <button class="option-btn" type="button" id="option4" onclick="selectOption(this)" name="answer" value="4">{{ question.option_d }}</button>
                 </form>
             </div>
             
@@ -47,6 +47,7 @@
             </div>
         </div>
         <div class="wrong-container" id="wrong-container" style="display:none;">
+            <img class="enemy_f" src="{{ character_img_f }}" alt="char" />
             <div class="answer-bubble">
                 <h1>Q{{ num }}. {{ question.question_text }}</h1>
                 <p class="ans">답: {{ question.correct_answer }}</p>
@@ -104,7 +105,7 @@
                     
                     setTimeout(function () {
                         alert(data.message);
-                        window.location.href = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+                        window.location.href = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
                     }, 1000);
                 } else if (data.status === 'wrong') {
                     alert(data.message);
@@ -113,8 +114,8 @@
                     setTimeout(function () {
                         document.querySelector('.wrap-container').style.display = 'none';
                         document.querySelector('.character').style.display = 'none';
-                        document.querySelector('.mychar').style.display = 'none';
                         document.querySelector('.magic').style.display = 'none';
+                        document.querySelector('.mychar').style.display = 'none';
                         document.querySelector('.question-container').style.display = 'none';
                         document.getElementById('wrong-container').style.display = 'block';
                     }, 1000);
@@ -132,7 +133,7 @@
 
         function nextQuestion() {
             const nextUrl = num >= 8 
-                ? "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}" 
+                ? "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}" 
                 : `/educations/multiple/${characters}/${subjects_id}/${chapter}/${num + 1}`;
             window.location.href = nextUrl;
         }
@@ -150,7 +151,7 @@
                 document.getElementById('lp1').style.display = 'none';
                 document.getElementById('lp2').style.display = 'none';
                 alert("클리어 실패!! 난이도 선택 화면으로 돌아갑니다");
-                var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+                var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
                 window.location.href = levelChoiceUrl;
             }
 
@@ -195,17 +196,17 @@
                 }
             }, 1000);
         });
-/*
+
         window.onload = function() {
 
 
             function redirectToLevelChoice() {
-                var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+                var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
                 window.location.href = levelChoiceUrl;
             }
         
             var currentUrl = window.location.href;
-            var levelChoiceUrlPattern = "{% url 'educations:level_choice' characters=characters subjects_id=subjects_id chapter=chapter %}";
+            var levelChoiceUrlPattern = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
         
             if (currentUrl !== levelChoiceUrlPattern) {
                 history.pushState(null, null, levelChoiceUrlPattern);
@@ -216,7 +217,7 @@
                     location.replace(levelChoiceUrlPattern);
                 }
             });
-        }; */
+        }; 
     </script>
 </body>
 </html>

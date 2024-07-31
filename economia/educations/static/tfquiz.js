@@ -14,10 +14,10 @@ document.addEventListener("DOMContentLoaded", function() {
             playSoundButton.addEventListener('click', () => {
                 if (isPlaying) {
                     audio.pause();
-                    playSoundButton.textContent = 'Play Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_off.png")';
                 } else {
                     audio.play();
-                    playSoundButton.textContent = 'Pause Sound';
+                    playSoundButton.style.backgroundImage = 'url("/static/images/music_on.png")';
                 }
                 isPlaying = !isPlaying;
             });
@@ -93,34 +93,51 @@ function submitAnswer(answer) {
             correctCount++;
             updateHPBar()
         } else {
-            document.querySelector('.magic').style.display = 'block';
-            document.querySelector('.mychar').classList.add('wrong');
-            setTimeout(function() {
-            alert('오답입니다. 설명: ' + data.explanation);
-            document.querySelector('.mychar').classList.remove('wrong');
-            document.querySelector('.magic').style.display = 'none';
-            }, 1000);
+            // document.querySelector('.magic').style.display = 'block';
+            // document.querySelector('.mychar').classList.add('wrong');
+            // setTimeout(function() {
+            // document.querySelector('.mychar').classList.remove('wrong');
+            // document.querySelector('.magic').style.display = 'none';
+            // }, 3000);
             wrongCount++;
             console.log(wrongCount)
             if(wrongCount==1){
+                document.querySelector('.magic').style.display = 'block';
+                document.querySelector('.mychar').classList.add('wrong');
+                setTimeout(function() {
+                document.querySelector('.mychar').classList.remove('wrong');
+                document.querySelector('.magic').style.display = 'none';
+                }, 3000);
                 document.getElementById('lp1').style.display = 'none';
+                alert('오답입니다. 설명: ' + data.explanation);
             }
             else if(wrongCount==2){
+                document.querySelector('.magic').style.display = 'block';
+                document.querySelector('.mychar').classList.add('wrong');
+                setTimeout(function() {
+                document.querySelector('.mychar').classList.remove('wrong');
+                document.querySelector('.magic').style.display = 'none';
+                }, 3000);
                     document.getElementById('lp2').style.display = 'none';
+                    alert('오답입니다. 설명: ' + data.explanation);
             }
             else if(wrongCount==3){
-                    document.getElementById('lp3').style.display = 'none';
-
-                window.location.href = initialData.levelurl;
+                document.querySelector('.magic').style.display = 'block';
+                document.querySelector('.mychar').classList.add('wrong');
+                document.getElementById('lp3').style.display = 'none';
+                alert('오답입니다. 설명: ' + data.explanation);
+                setTimeout(function() {
+                document.querySelector('.wrap-container').style.display = 'none';
+                document.querySelector('.wrong-container').style.display = 'block';
+                }, 3000);
             }
+            
         }
         questionCount++;
        
         console.log(correctCount)
         if (correctCount === 5) {
-            document.querySelector('.wrap-container').style.display = 'none';
-            document.querySelector('.wrong-container').style.display = 'block';
-            document.getElementById('question-text').style.display = 'none';
+            alert('스테이지 클리어!!!');
             // 모든 문제를 맞췄을 때 Stage 모델 업데이트 요청
             fetch('/educations/update_stage/', {
                 method: 'POST',
@@ -137,7 +154,8 @@ function submitAnswer(answer) {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert('모든 문제를 맞췄습니다!');
+                    // var levelChoiceUrl = "{% url 'educations:level_choice' characters=characters subjects=subjects chapter=chapter %}";
+                    // window.location.href = levelChoiceUrl;
                 } else {
                     alert('Stage 업데이트 중 오류가 발생했습니다.');
                 }

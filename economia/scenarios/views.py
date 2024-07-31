@@ -1,8 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 from django.utils import timezone
 import requests
 from economia.models import *
@@ -24,6 +22,22 @@ from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
 # Create your views here.
 
+import numpy as np
+import openai
+import faiss
+import pickle
+import random
+import re
+import difflib
+
+from langchain_core.prompts import PromptTemplate
+from langchain.chat_models import ChatOpenAI
+from langchain.vectorstores import FAISS
+from sentence_transformers import SentenceTransformer
+
+from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
+from langchain_core.pydantic_v1 import BaseModel, Field
+
 class ProtectedView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -33,6 +47,14 @@ class ProtectedView(APIView):
         return Response(content)
 
 
+embedding = SentenceTransformer('jhgan/ko-sroberta-multitask')  # 임베딩 모델 가져오기
+faiss_vectorstore = FAISS.load_local('./faiss_jiwoo', embedding, allow_dangerous_deserialization=True)
+
+class scenario_form(BaseModel):
+    title : str = Field(description="제목")
+    question: str = Field(description="배경")
+    ans: str = Field(description="답")
+    
 @api_view(['GET'])
 def getScenarioDatas(request):
     datas = Scenario.objects.all()
@@ -81,9 +103,24 @@ def delete_childcomment(request, id):
     childcomment.delete()
     return redirect('scenarios:previous_scenario', id=request.POST.get('scenario_id'))
 
+@api_view(['POST']) #대댓글 입력 폼
+def create_scenario_ai(request):
+    parent_id = request.POST.get('parent_id')
+    text = request.POST.get('childcomment_text')
+    characters_id = get_player(request, 'characters')
+    image = request.FILES.get('image')
+    child_comment = ChildComments(parent_id=parent_id, characters_id=characters_id, texts=text, imgfile=image)
+    child_comment.save()
+    scenario_id = request.POST.get('scenario_id')
+    return redirect('scenarios:previous_scenario', id=scenario_id)
+
+
+
 def scenario_list(request):
     staff = get_staff(request)
     print(staff)
+    
+    # 외부 API로부터 시나리오 데이터 가져오기
     scenario_response = requests.get('http://127.0.0.1:8000/scenarios/scenario_datas')
     scenario_data = scenario_response.json()
     
@@ -103,11 +140,20 @@ def scenario_list(request):
 
         item['start_time_utc'] = start_time_utc
 
+        # Subjects 모델에서 subjects 이름을 가져오기
+        subject_id = item['subjects']
+        try:
+            subject = Subjects.objects.get(id=subject_id)
+            item['subject_name'] = subject.subjects
+        except Subjects.DoesNotExist:
+            item['subject_name'] = 'Unknown'
+
     scenario_data.sort(key=lambda x: x['start_time_utc'], reverse=True)
 
     paginator = Paginator(scenario_data, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    print(page_obj.object_list)
     
     context = {
         'page_obj': page_obj,
@@ -122,15 +168,50 @@ def scenario(request, id):
     data = response.json()
     return render(request, 'scenario.html', {'scenario': data})
 
+def make_scenario(cate):
+    cate_indices = []
+    for doc_id, doc in faiss_vectorstore.docstore.items():
+        if cate in doc.metadata.get('Cate', ''):
+            cate_indices.append(doc_id)
+        
+    idx = random.sample(cate_indices, 1)
+    doc = faiss_vectorstore.docstore[idx[0]]
+    doc.page_content
+    
+    output_parser = JsonOutputParser(pydantic_object=scenario_form)    # 지정된 pydantic 모델에 맞게 데이터를 구조화하여 제공
+    format_instructions = output_parser.get_format_instructions()
+    query = '''Documents와 연관된 구체적인 가상의 배경을 포함하는 시나리오 문제와 적절한 답과 제목을 만들어줘.
+             제목은 title에, 시나리오는 question에, 답은 ans에 넣어줘. 한국어로 해줘.''',
+
+    template = '''
+        아래의 자료만을 사용하여 질문에 답하세요: 
+        {context}
+        답변은 해당 형식에 맞게 모아서 만들어주세요:
+        {form}
+
+        질문: {question}
+        '''
+        
+    model = ChatOpenAI(model="gpt-4o", temperature=0.5)
+
+    prompt = PromptTemplate.from_template(template)
+
+    chain = prompt | model | output_parser
+    res = chain.invoke({'context': doc, 'form':format_instructions, 'question': query})
+    return res
+
 def create_scenario(request): #시나리오 생성
+    subject_list = Subjects.objects.values_list('subjects', flat=True)
     if request.method == 'POST':
-        form = ScenarioForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('scenarios:scenario_list')  # Assuming you have a view to list scenarios
-    else:
-        form = ScenarioForm()
-    return render(request, 'create_scenario.html', {'form': form})
+        subject = request.POST.get('selected_subject')
+        result = make_scenario(subject)
+        s_title = result['title']
+        s_question = result['question']
+        s_ans = result['ans']
+        subject_id = Subjects.objects.get(subjects = subject)
+        Scenario.objects.create(subjects_id = subject_id.id, title=s_title, question_text = s_question, ai_answer=s_ans)
+        return redirect('scenarios:scenario_list')
+    return render(request, 'create_scenario.html', {'subject_list': subject_list})
 
 
 
@@ -211,13 +292,15 @@ def previous_scenario(request, id):
             'player_nickname': child.characters.player.nickname,  # Player 닉네임 추가
             'img' : child.imgfile
         })
-    
+    sce = Scenario.objects.get(id = id)
+    ai_answer = sce.ai_answer
     context = {
         'scenario': scenario_data,
         'comment': comment_data_updated,
         'childcomment': childcomment_data,
         'characters_id' : characters_id,
         'has_character_comment': has_character_comment,
+        'ai_answer': ai_answer,
     }
     
     return render(request, 'previous_scenario.html', context)
@@ -259,13 +342,23 @@ def submit_answer(request): #시나리오 답 제출
         scenario_id = request.POST.get('scenario_id')
         scenario_answer = request.POST.get('scenario_answer')
         characters_id = get_player(request, 'characters')
+        sce = Scenario.objects.get(id=scenario_id)
+        ai_ans = sce.ai_answer
         # Assume characters_id is fixed as 1 for testing purposes
 
+        sentences = (ai_ans, scenario_answer)
+        answer_bytes_list = list(bytes(sentences[0], 'utf-8'))
+        input_bytes_list = list(bytes(sentences[1], 'utf-8'))
+
+        sm = difflib.SequenceMatcher(None, answer_bytes_list, input_bytes_list)
+        similar = int(sm.ratio() * 100)
+        
+        
         # Create a new Comment object
         new_comment = Comments(
             scenario_id=scenario_id,
             characters_id=characters_id,
-            percents=0,  # Adjust the percents field as needed
+            percents=similar,  # Adjust the percents field as needed
             texts=scenario_answer,
             like_cnt=0
         )
