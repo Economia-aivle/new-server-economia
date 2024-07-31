@@ -24,5 +24,4 @@ urlpatterns = [
     path('getStageDatas/<int:characters>/', views.getStageDatas, name='StageDatas'),
     path('update_stage/', views.update_stage, name='update_stage'),
     path('success', views.success, name='success'),
-    path('chatbot', views.chatbot, name='chatbot'),
-]
+    #path('chatbot', views.chatbot, name='chatbot'),

@@ -29,7 +29,7 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 
 from transformers import TextStreamer, AutoModelForCausalLM, AutoTokenizer, StoppingCriteria, StoppingCriteriaList
 
-#챗봇
+# 챗봇
 # 모델과 토크나이져 로드
 model_name = "harangstar/Llama3"
 model = AutoModelForCausalLM.from_pretrained(model_name).to("cpu")
@@ -43,15 +43,13 @@ alpaca_prompt = """Below is an instruction that describes a task. Write a respon
 ### Response:
 {}"""
 
-
-
-
 embedding = SentenceTransformer('jhgan/ko-sroberta-multitask')  # 임베딩 모델 가져오기
 faiss_vectorstore = FAISS.load_local('./faiss_jiwoo', embedding, allow_dangerous_deserialization=True)
 faiss_index = faiss.read_index('./faiss_index.bin')
 
 with open('./documents.pkl', 'rb') as file:
     documents = pickle.load(file)
+
 
 class Retriever:
     @staticmethod
@@ -101,33 +99,34 @@ class Retriever:
 
         return results_dict
 
+
 class selc_question_form(BaseModel):
     question: list = Field(description="문제")
     exam: list = Field(description="보기")
     ans: list = Field(description="답")
-    expl : list = Field(description="설명")
-    
+    expl: list = Field(description="설명")
+
+
 class question_form(BaseModel):
     question: list = Field(description="문제")
     ans: list = Field(description="답")
-    expl : list = Field(description="설명")
+    expl: list = Field(description="설명")
+
 
 query_set = query_set = ['''Documents마다 OX 문제와 답, 문제를 푸는 설명 한 개씩 총 8문제를 만들어줘.
              문제는 question에, 답은 ans에, 설명은 expl에 넣어줘.
-             문제는 번호없이 만들어줘.''', 
-             '''Documents마다 보기가 4개인 문제와 답, 문제를 푸는 설명 한 개씩 총 8문제를 한국어로 만들어줘. 
-             보기는 숫자를 포함해서 표시해줘. 답은 int형으로 숫자만 알려줘. 중복 답은 없도록 해줘.
-             문제는 question에, 보기는 exam에, 답은 ans에, 설명은 expl에 넣어줘.
              문제는 번호없이 만들어줘.''',
-             '''Documents마다 빈칸 맞추는 문제와 답, 문제를 푸는 설명 한 개씩 총 8문제를 만들어줘. 
-             답은 영어가 없는 명사로 만들어줘. 중복 답은 없도록 해줘.
-             문제는 question에, 답은 ans에, 설명은 expl에 넣어줘.
-             문제는 번호없이 만들어줘.''',
-             ]
-
+                         '''Documents마다 보기가 4개인 문제와 답, 문제를 푸는 설명 한 개씩 총 8문제를 한국어로 만들어줘. 
+                         보기는 숫자를 포함해서 표시해줘. 답은 int형으로 숫자만 알려줘. 중복 답은 없도록 해줘.
+                         문제는 question에, 보기는 exam에, 답은 ans에, 설명은 expl에 넣어줘.
+                         문제는 번호없이 만들어줘.''',
+                         '''Documents마다 빈칸 맞추는 문제와 답, 문제를 푸는 설명 한 개씩 총 8문제를 만들어줘. 
+                         답은 영어가 없는 명사로 만들어줘. 중복 답은 없도록 해줘.
+                         문제는 question에, 답은 ans에, 설명은 expl에 넣어줘.
+                         문제는 번호없이 만들어줘.''',
+                         ]
 
 form_set = [question_form, selc_question_form, question_form]
-
 
 
 @api_view(['GET'])
@@ -136,11 +135,13 @@ def getBlankDatas(request, characters):
     serializer = BlankSerializer(datas, many=True)
     return Response(serializer.data)
 
+
 @api_view(['GET'])
 def getMultipleDatas(request, characters):
     datas = Multiple.objects.filter(characters=characters)
     serializer = MultipleSerializer(datas, many=True)
     return Response(serializer.data)
+
 
 @api_view(['GET'])
 def getTfDatas(request, characters):
@@ -148,11 +149,13 @@ def getTfDatas(request, characters):
     serializer = TfSerializer(datas, many=True)
     return Response(serializer.data)
 
+
 @api_view(['GET'])
 def getSubjectDatas(request, subjects):
     datas = Subjects.objects.filter(subjects=subjects)
     serializer = SubjectSerializer(datas, many=True)
     return Response(serializer.data)
+
 
 @api_view(['GET'])
 def getStageDatas(request, characters):
@@ -160,52 +163,52 @@ def getStageDatas(request, characters):
     serializer = StageSerializer(datas, many=True)
     return Response(serializer.data)
 
+
 def previous_quiz(request, characters):
-    
     characters = get_player(request, 'characters')
-    
+
     blank_response = requests.get(f'http://127.0.0.1:8000/educations/blankdatas/{characters}')
     blank_data = blank_response.json()
 
     # 두 번째 API 요청
     multiple_response = requests.get(f'http://127.0.0.1:8000/educations/multipledatas/{characters}')
     multiple_data = multiple_response.json()
-    
+
     tf_response = requests.get(f'http://127.0.0.1:8000/educations/tfdatas/{characters}')
     tf_data = tf_response.json()
-    
+
     for item in blank_data:
         subject_id = item.get('subjects')
         if subject_id:
             subject_instance = Subjects.objects.filter(id=subject_id).first()
             if subject_instance:
                 item['subjects'] = subject_instance.subjects
-                
+
     for item in tf_data:
         subject_id = item.get('subjects')
         if subject_id:
             subject_instance = Subjects.objects.filter(id=subject_id).first()
             if subject_instance:
                 item['subjects'] = subject_instance.subjects
-                
+
     for item in multiple_data:
         subject_id = item.get('subjects')
         if subject_id:
             subject_instance = Subjects.objects.filter(id=subject_id).first()
             if subject_instance:
                 item['subjects'] = subject_instance.subjects
-    
+
     subject_list = Subjects.objects.values_list('subjects', flat=True)
 
-    
     # 템플릿에 데이터를 전달
     context = {
         'blank': blank_data,
         'multiple': multiple_data,
-        'tf' : tf_data,
+        'tf': tf_data,
         'subject_list': subject_list,
     }
     return render(request, 'previous_quiz.html', context)
+
 
 def success(request):
     return render(request, 'success.html')
@@ -216,6 +219,7 @@ def previous_quiz_answer(request, characters):
     data = response.json()
     return render(request, 'previous_quiz_answer.html', {'multiple': data})
 
+
 # Create your views here.
 def level_choice(request, characters, subjects, chapter):
     chapter = int(chapter)
@@ -225,10 +229,10 @@ def level_choice(request, characters, subjects, chapter):
     subjects_id = sub.id
     # characters 정보 가져오기
     characters = get_player(request, 'characters')
-    
+
     # subjects_id와 일치하는 chapter 찾기
     chapter_item = next((item for item in data if item['id'] == subjects_id), None)
-    
+
     if chapter_item:
         chapter_content = chapter_item['chapters']
         chapter_list = chapter_content.split(', ')
@@ -241,9 +245,10 @@ def level_choice(request, characters, subjects, chapter):
         chapter_sub = stage_data.chapter_sub
     except Stage.DoesNotExist:
         # Stage가 없을 경우 새로운 Stage 객체를 생성합니다.
-        stage_data = Stage.objects.create(characters_id=characters, chapter=chapter, chapter_sub=1, subjects_id=subjects_id)
+        stage_data = Stage.objects.create(characters_id=characters, chapter=chapter, chapter_sub=1,
+                                          subjects_id=subjects_id)
         chapter_sub = stage_data.chapter_sub
-    
+
     context = {
         'characters': characters,
         'subjects_id': subjects_id,
@@ -251,12 +256,13 @@ def level_choice(request, characters, subjects, chapter):
         'chapter_sub': chapter_sub,
         'part': part,
     }
-    
+
     return render(request, 'level_choice.html', context)
 
+
 def make_qa(cate, chap, type_n):
-# 출력 파서 정의
-    output_parser = JsonOutputParser(pydantic_object=form_set[type_n])    # 지정된 pydantic 모델에 맞게 데이터를 구조화하여 제공
+    # 출력 파서 정의
+    output_parser = JsonOutputParser(pydantic_object=form_set[type_n])  # 지정된 pydantic 모델에 맞게 데이터를 구조화하여 제공
     format_instructions = output_parser.get_format_instructions()
     query = query_set[type_n]
 
@@ -269,7 +275,6 @@ def make_qa(cate, chap, type_n):
         질문: 중학교 수준의 문제를 만들어줘. {question}
         '''
 
-
     model = ChatOpenAI(model="gpt-4o", temperature=0.5)
 
     # query = "수출입은행의 역할과 중요성 교육"
@@ -277,7 +282,7 @@ def make_qa(cate, chap, type_n):
     prompt = PromptTemplate.from_template(template)
 
     chain = prompt | model | output_parser
-    res = chain.invoke({'context': results['documents'], 'form':format_instructions, 'question': query})
+    res = chain.invoke({'context': results['documents'], 'form': format_instructions, 'question': query})
     return res
 
 
@@ -288,7 +293,7 @@ def tf_quiz_view(request):
         chapter = request.GET.get('chapter')
         subjects_id = request.GET.get('subjects_id')  # 수정된 부분
         # characters = request.GET.get('characters')
-        
+
         if not chapter or not subjects_id:
             return JsonResponse({"error": "Chapter and subjects are required."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -296,7 +301,7 @@ def tf_quiz_view(request):
         if not questions:
             return JsonResponse({"error": "No questions available."}, status=status.HTTP_404_NOT_FOUND)
         # question = random.choice(questions)
-        num = request.session.get('num', 0) 
+        num = request.session.get('num', 0)
         question = questions.order_by('-id')[num]
         num = request.session.get('num', 0) + 1
         request.session['num'] = num
@@ -323,7 +328,7 @@ def tf_quiz_view(request):
 
         correct_answer = question.correct_answer
         is_correct = submitted_answer.upper() == correct_answer.upper()
-        
+
         response_data = {
             "question_id": question.id,
             "submitted_answer": submitted_answer,
@@ -331,10 +336,11 @@ def tf_quiz_view(request):
             "is_correct": is_correct,
             "explanation": question.explanation if not is_correct else None
         }
-        
+
         return JsonResponse(response_data, status=status.HTTP_200_OK)
     else:
         return JsonResponse({"error": "Invalid request method"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @csrf_exempt
 def update_stage(request):
@@ -357,6 +363,7 @@ def update_stage(request):
     else:
         return JsonResponse({"error": "Invalid request method"}, status=400)
 
+
 def tf_quiz_page(request, subjects_id, chapter):
     characters = get_player(request, 'characters')
     character = Characters.objects.get(id=characters)
@@ -364,7 +371,7 @@ def tf_quiz_page(request, subjects_id, chapter):
     sounds = ['sounds/back_sound1.mp3', 'sounds/back_sound2.mp3', 'sounds/back_sound3.mp3']
     random_sound = random.choice(sounds)
     print(character_img)
-    
+
     if 'char1' in character_img:
         character_img_f = character_img.replace('char1', 'char1 f')
     elif 'char2' in character_img:
@@ -377,40 +384,40 @@ def tf_quiz_page(request, subjects_id, chapter):
         character_img_f = character_img.replace('char5', 'char5 f')
     else:
         character_img_f = character_img  # 위 조건에 해당하지 않는 경우 원본 URL 유지
-    
+
     sub = Subjects.objects.get(id=subjects_id)
     subjects = sub.subjects
     chapters_list = sub.chapters.split(', ')
-    chapter_name = chapters_list[int(chapter) - 1] 
+    chapter_name = chapters_list[int(chapter) - 1]
     result = make_qa(subjects, chapter_name, 0)
     m_question = result['question']
     m_ans = result['ans']
     m_expl = result['expl']
     print(m_question)
     print(m_ans)
-    
+
     problem_count = Tf.objects.filter(characters_id=characters).count()
     if problem_count > 50:
         old_problem = Tf.objects.filter(characters_id=characters).order_by('id')[:8]
         for obj in old_problem:
             obj.delete()
         print('오래된 문제 삭제')
-        
-    
+
     for i in range(8):
         Tf.objects.create(characters_id=characters, question_text=m_question[i], correct_answer=m_ans[i],
                           subjects_id=subjects_id, chapter=chapter, explanation=m_expl[i])
     context = {
-            'characters': characters,
-              'subjects_id': subjects_id,
-              'chapter': chapter,
-              'character_img':character_img,
-              'random_sound': random_sound,
-              'character_img_f': character_img_f,
-              'subjects':subjects,
-              'chapter_name':chapter_name,
-    } 
+        'characters': characters,
+        'subjects_id': subjects_id,
+        'chapter': chapter,
+        'character_img': character_img,
+        'random_sound': random_sound,
+        'character_img_f': character_img_f,
+        'subjects': subjects,
+        'chapter_name': chapter_name,
+    }
     return render(request, 'tfquiz.html', context)
+
 
 def choose_tf_chapter_view(request):
     if request.method == 'POST':
@@ -434,8 +441,6 @@ def choose_tf_chapter_view(request):
         return JsonResponse({"questions": question_data}, status=status.HTTP_200_OK)
     else:
         return JsonResponse({"error": "Invalid request method"}, status=status.HTTP_400_BAD_REQUEST)
-    
-
 
 
 def multiple(request, characters, subjects_id, chapter, num):
@@ -447,7 +452,7 @@ def multiple(request, characters, subjects_id, chapter, num):
     print(character_img)
     sub = Subjects.objects.get(id=subjects_id)
     subjects = sub.subjects
-    
+
     if 'char1' in character_img:
         character_img_f = character_img.replace('char1', 'char1 f')
     elif 'char2' in character_img:
@@ -460,7 +465,7 @@ def multiple(request, characters, subjects_id, chapter, num):
         character_img_f = character_img.replace('char5', 'char5 f')
     else:
         character_img_f = character_img  # 위 조건에 해당하지 않는 경우 원본 URL 유지
-    
+
     random_sound = 'sounds/back_sound3.mp3'
     multiple_response = requests.get(f'http://127.0.0.1:8000/educations/multipledatas/{characters}')
     multiple_data = multiple_response.json()
@@ -474,14 +479,16 @@ def multiple(request, characters, subjects_id, chapter, num):
     if num == 9:
         return redirect('educations:level_choice', characters=characters, subjects_id=subjects_id, chapter=chapter)
     # # POST 요청 처리
-    if request.method == 'POST':     
+    if request.method == 'POST':
         multiple_response = requests.get(f'http://127.0.0.1:8000/educations/multipledatas/{characters}')
         multiple_data = multiple_response.json()
-        multiple_list = [item for item in multiple_data if item['characters'] == characters and item['subjects'] == subjects_id and item['chapter'] == chapter]
+        multiple_list = [item for item in multiple_data if
+                         item['characters'] == characters and item['subjects'] == subjects_id and item[
+                             'chapter'] == chapter]
         print(multiple_list)
         user_answer = request.POST.get('answer')
         correct_answer = multiple_list[-num]['correct_answer']
-        
+
         if user_answer == correct_answer:
             # 정답인 경우
             correct_count = request.session.get('correct_count', 0) + 1
@@ -492,16 +499,16 @@ def multiple(request, characters, subjects_id, chapter, num):
                 try:
                     stage_data = Stage.objects.get(characters_id=characters, subjects_id=subjects_id, chapter=chapter)
                     character_score = SubjectsScore.objects.get(characters_id=characters, subjects_id=subjects_id)
-                    character_exp = Characters.objects.get(id = characters)
+                    character_exp = Characters.objects.get(id=characters)
                     stage_data.chapter_sub = 3
-                    character_score.score +=10
-                    character_exp.exp +=10
+                    character_score.score += 10
+                    character_exp.exp += 10
                     character_score.save()
                     stage_data.save()
                     character_exp.save()
                 except Stage.DoesNotExist:
                     pass
-                
+
                 # 세션 초기화
                 request.session['correct_count'] = 0
 
@@ -521,7 +528,7 @@ def multiple(request, characters, subjects_id, chapter, num):
             subjects = sub.subjects
             print(subjects)
             chapters_list = sub.chapters.split(', ')
-            chapter_name = chapters_list[int(chapter) - 1] 
+            chapter_name = chapters_list[int(chapter) - 1]
             result = make_qa(subjects, chapter_name, 1)
             m_question = result['question']
             m_exam = result['exam']
@@ -530,45 +537,45 @@ def multiple(request, characters, subjects_id, chapter, num):
             print(m_question)
             print(m_exam)
             print(m_ans)
-            
+
             for i in range(8):
                 a = m_exam[i][0]
                 b = m_exam[i][1]
                 c = m_exam[i][2]
                 d = m_exam[i][3]
                 Multiple.objects.create(characters_id=characters, question_text=m_question[i],
-                                option_a = a, option_b = b, option_c = c, option_d = d,
-                                correct_answer=int(m_ans[i]), subjects_id=subjects_id, chapter=chapter, explanation=m_expl[i])
+                                        option_a=a, option_b=b, option_c=c, option_d=d,
+                                        correct_answer=int(m_ans[i]), subjects_id=subjects_id, chapter=chapter,
+                                        explanation=m_expl[i])
 
     correct_count = request.session.get('correct_count', 0)
     wrong_count = request.session.get('wrong_count', 0)
     hp_percentage = max(0, 100 - (correct_count * 20))  # 체력 퍼센트 계산
-    
+
     multiple_response = requests.get(f'http://127.0.0.1:8000/educations/multipledatas/{characters}')
     multiple_data = multiple_response.json()
-    
-    multiple_list = [item for item in multiple_data if item['characters'] == characters and item['subjects'] == subjects_id and item['chapter'] == chapter]
-    question = multiple_list[-num]
-    
-    
-    context ={'question': question,
-              'num': num,
-              'characters': characters,
-              'subjects_id': subjects_id,
-              'chapter': chapter,
-              'correct_count': correct_count,
-              'hp_percentage': hp_percentage,
-              'wrong_count' : wrong_count,
-              'character_img' : character_img,
-              'random_sound' :random_sound,
-              'character_img_f':character_img_f,
-              'subjects':subjects,
-              }
-    
-    
-    # GET 요청 처리
-    return render(request, 'multiple.html', context )
 
+    multiple_list = [item for item in multiple_data if
+                     item['characters'] == characters and item['subjects'] == subjects_id and item[
+                         'chapter'] == chapter]
+    question = multiple_list[-num]
+
+    context = {'question': question,
+               'num': num,
+               'characters': characters,
+               'subjects_id': subjects_id,
+               'chapter': chapter,
+               'correct_count': correct_count,
+               'hp_percentage': hp_percentage,
+               'wrong_count': wrong_count,
+               'character_img': character_img,
+               'random_sound': random_sound,
+               'character_img_f': character_img_f,
+               'subjects': subjects,
+               }
+
+    # GET 요청 처리
+    return render(request, 'multiple.html', context)
 
 
 def blank(request, characters, subjects_id, chapter, num):
@@ -578,7 +585,7 @@ def blank(request, characters, subjects_id, chapter, num):
     print(character_img)
     sub = Subjects.objects.get(id=subjects_id)
     subjects = sub.subjects
-    
+
     if 'char1' in character_img:
         character_img_f = character_img.replace('char1', 'char1 f')
     elif 'char2' in character_img:
@@ -591,8 +598,7 @@ def blank(request, characters, subjects_id, chapter, num):
         character_img_f = character_img.replace('char5', 'char5 f')
     else:
         character_img_f = character_img  # 위 조건에 해당하지 않는 경우 원본 URL 유지
-    
-    
+
     random_sound = 'sounds/back_sound2.mp3'
     problem_count = Multiple.objects.filter(characters_id=characters).count()
     if problem_count > 50:
@@ -600,18 +606,20 @@ def blank(request, characters, subjects_id, chapter, num):
         for obj in old_problem:
             obj.delete()
         print('오래된 문제 삭제')
-   
+
     if num == 9:
         return redirect('educations:level_choice', characters=characters, subjects_id=subjects_id, chapter=chapter)
-    
+
     if request.method == 'POST':
         blank_response = requests.get(f'http://127.0.0.1:8000/educations/blankdatas/{characters}')
         blank_data = blank_response.json()
-        blank_list = [item for item in blank_data if item['characters'] == characters and item['subjects'] == subjects_id and item['chapter'] == chapter]
-        
+        blank_list = [item for item in blank_data if
+                      item['characters'] == characters and item['subjects'] == subjects_id and item[
+                          'chapter'] == chapter]
+
         user_answer = request.POST.get('answer')
         correct_answer = blank_list[-num]['correct_answer']
-        
+
         if user_answer == correct_answer:
             # 정답인 경우
             blank_correct_count = request.session.get('blank_correct_count', 0) + 1
@@ -624,15 +632,15 @@ def blank(request, characters, subjects_id, chapter, num):
                     stage_data = Stage.objects.get(characters_id=characters, subjects_id=subjects_id, chapter=chapter)
                     character_exp = Characters.objects.get(id=characters)
                     character_score = SubjectsScore.objects.get(characters_id=characters, subjects_id=subjects_id)
-                    character_exp.exp +=10
-                    character_score.score +=10
+                    character_exp.exp += 10
+                    character_score.score += 10
                     stage_data.chapter_sub = 3
                     character_exp.save()
                     character_score.save()
                     stage_data.save()
                 except Stage.DoesNotExist:
                     pass
-                
+
                 # 세션 초기화
                 request.session['blank_correct_count'] = 0
                 request.session.modified = True  # 세션 데이터가 변경되었음을 명시
@@ -649,34 +657,35 @@ def blank(request, characters, subjects_id, chapter, num):
             print(f"Wrong count updated: {blank_wrong_count}")
             # 오답인 경우
             return JsonResponse({'status': 'wrong', 'message': '오답입니다.'})
-    
+
     else:
         if num == 1:
             sub = Subjects.objects.get(id=subjects_id)
             subjects = sub.subjects
             chapters_list = sub.chapters.split(', ')
-            chapter_name = chapters_list[int(chapter) - 1] 
+            chapter_name = chapters_list[int(chapter) - 1]
             result = result = make_qa(subjects, chapter_name, 2)
             m_question = result['question']
             m_ans = result['ans']
             m_expl = result['expl']
             print(m_question)
             print(m_ans)
-        
+
             for i in range(8):
                 Blank.objects.create(characters_id=characters, question_text=m_question[i], correct_answer=m_ans[i],
-                                subjects_id=subjects_id, chapter=chapter, explanation=m_expl[i])
+                                     subjects_id=subjects_id, chapter=chapter, explanation=m_expl[i])
     blank_response = requests.get(f'http://127.0.0.1:8000/educations/blankdatas/{characters}')
     blank_data = blank_response.json()
 
-    blank_list = [item for item in blank_data if item['characters'] == characters and item['subjects'] == subjects_id and item['chapter'] == chapter]
+    blank_list = [item for item in blank_data if
+                  item['characters'] == characters and item['subjects'] == subjects_id and item['chapter'] == chapter]
     question = blank_list[-num]
 
     blank_correct_count = request.session.get('blank_correct_count', 0)
     blank_wrong_count = request.session.get('blank_wrong_count', 0)
     hp_percentage = max(0, 100 - (blank_correct_count * 20))  # 체력 퍼센트 계산
     context = {
-        'character_img_f':character_img_f,
+        'character_img_f': character_img_f,
         'question': question,
         'num': num,
         'characters': characters,
@@ -687,20 +696,19 @@ def blank(request, characters, subjects_id, chapter, num):
         'wrong_count': blank_wrong_count,
         'character_img': character_img,
         'random_sound': random_sound,
-        'subjects':subjects,
+        'subjects': subjects,
     }
 
     return render(request, 'blank.html', context)
 
-    
+
 def study(request, subjects_id):
     subject = Subjects.objects.get(id=subjects_id)
     subject_name = subject.subjects
     context = {
         'subject_name': subject_name,
     }
-    return render(request,'study.html', context)
-
+    return render(request, 'study.html', context)
 
 
 def chatbot(request):
@@ -724,11 +732,12 @@ def chatbot(request):
                 streamer=text_streamer,
                 max_new_tokens=50,  # 생성할 토큰 수
             )
-            
+
             return JsonResponse({'response': output})
         except json.JSONDecodeError:
             return JsonResponse({'error': '잘못된 JSON 형식입니다.'}, status=400)
     return JsonResponse({'error': '잘못된 요청 방법입니다.'}, status=405)
+
 
 def chapter(request, subjects):
     response = requests.get(f'http://127.0.0.1:8000/educations/getSubjectDatas/{subjects}/')
@@ -739,11 +748,12 @@ def chapter(request, subjects):
         chapter['chapters_list'] = chapter_content.split(', ')
     context = {
         'chapter': data,
-        'characters':characters,
-        
+        'characters': characters,
+
     }
     print(data)
-    return render(request,'chapter.html', context)
+    return render(request, 'chapter.html', context)
+
 
 @csrf_exempt
 def study_view(request):
@@ -754,7 +764,6 @@ def study_view(request):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
-
 def get_player(request, id):
     access_token = request.COOKIES.get('access_token')
     refresh_token = request.COOKIES.get('refresh_token')
@@ -762,10 +771,10 @@ def get_player(request, id):
     # 디버깅 로그 추가
     print("Access Token:", access_token)
     print("Refresh Token:", refresh_token)
-    
+
     if not access_token:
         return JsonResponse({"error": "토큰이 없습니다."}, status=400)
-    
+
     decoded = jwt.decode(access_token, 'economia', algorithms=['HS256'])
     decoded['access_token'] = access_token
     player = Player.objects.get(player_id=decoded['player_id'])
@@ -780,4 +789,3 @@ def get_player(request, id):
         return characters_id
     else:
         return player_id
-    
